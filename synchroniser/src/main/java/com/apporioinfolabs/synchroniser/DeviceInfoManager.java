@@ -43,7 +43,7 @@ public class DeviceInfoManager {
             jsonObject.put("fingerprint",Build.FINGERPRINT);
             jsonObject.put("release",Build.VERSION.RELEASE);
         }catch (Exception e){
-           APPORIOLOGS.errorLog(TAG, ""+e.getMessage());
+           APPORIOLOGS.exceptionLog(TAG, ""+e.getMessage());
         }
 
 
@@ -55,7 +55,7 @@ public class DeviceInfoManager {
         try {
             batteryJsonObject.put("battery_level",batteryStats.getLevel()).put("charging_status","NA");
         }catch (Exception e){
-           APPORIOLOGS.errorLog(TAG , ""+e.getMessage());
+           APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage());
         }
         return batteryJsonObject ;
     }

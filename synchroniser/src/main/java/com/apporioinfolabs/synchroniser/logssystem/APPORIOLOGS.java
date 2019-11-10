@@ -24,8 +24,11 @@ public class APPORIOLOGS {
 
 
     public static void exceptionLog (String tag , String message){
-
         HyperLog.w(tag , message);
+    }
+
+    public static void locationLog(String locationJson){
+        HyperLog.i("LOCATION_LOG", locationJson);
     }
 
 

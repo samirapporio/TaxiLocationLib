@@ -33,7 +33,7 @@ public class AtsLocationManager {
     private LocationRequest locationRequest;
     private Context mContext;
     private final static String TAG = "AtsLocationManager";
-    private static EventLocation eventLocation;
+    private static AtsLocationEvent atsLocationEvent;
     private static JSONObject locationJsonObject ;
 
 
@@ -41,7 +41,7 @@ public class AtsLocationManager {
     public AtsLocationManager(final Context context) {
         this.mContext = context;
 
-        eventLocation = new EventLocation();
+        atsLocationEvent = new AtsLocationEvent();
         locationJsonObject = new JSONObject();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         locationCallback = new LocationCallback() {
@@ -53,13 +53,12 @@ public class AtsLocationManager {
                 }
                 for (Location location : locationResult.getLocations()) {
                     try{
-                        eventLocation.setPojolocation(location);
-                        eventLocation.setLocation(getLocationObject(location, locationJsonObject));
-                        EventBus.getDefault().post(eventLocation);
+                        atsLocationEvent.setPojolocation(location);
+                        atsLocationEvent.setLocation(getLocationObject(location, locationJsonObject));
+                        EventBus.getDefault().post(atsLocationEvent);
                     }catch (Exception e){
                         APPORIOLOGS.exceptionLog(TAG, ""+e.getMessage());
                     }
-                    APPORIOLOGS.debugLog(TAG, "Location: " + location.getLatitude() + "," + location.getLatitude());
                 }
             }
         };
@@ -117,7 +116,7 @@ public class AtsLocationManager {
         try{
             fusedLocationClient.removeLocationUpdates(locationCallback);
         }catch (Exception e){
-           APPORIOLOGS.errorLog(TAG , ""+e.getMessage());
+           APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage());
         }
 
     }

@@ -40,7 +40,7 @@ public class NetworkInfoManager {
             jsonObject.put("internet_conneted",isInternetAvailable());
             jsonObject.put("socket_connected",ATSApplication.isSocketConnected());
         }catch (Exception e){
-            APPORIOLOGS.errorLog(TAG , ""+e.getMessage());
+            APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage());
         }
         return jsonObject ;
     }

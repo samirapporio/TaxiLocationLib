@@ -44,7 +44,7 @@ public abstract class ATSApplication extends Application  implements Application
     public static PendingIntent notificationClickIntent = null;
     public static String notificatioOnlineText = "You are on duty now.";
     public static String notificatioMakingOnlineText = "Making you online . . . ";
-    public static int CashLength = 21 ;
+    public static int CashLength = 25 ;
     public static boolean setIntervalRunningWhenVehicleStops = true ;
     public static JSONObject onConnectionObject ;
     public static String UNIQUE_NO  = "";
@@ -54,7 +54,7 @@ public abstract class ATSApplication extends Application  implements Application
     private boolean isActivityChangingConfigurations = false;
     private Gson gson ;
 
-    private static final String EndPoint = "http://13.233.98.63:3108/api/v1/logs/add_log";
+    public static final String EndPoint = "http://13.233.98.63:3108/api/v1/logs/add_log";
 
     @Override
     public void onCreate() {
@@ -76,11 +76,8 @@ public abstract class ATSApplication extends Application  implements Application
 //            }
         }
         catch (Exception e){
-            APPORIOLOGS.errorLog(TAG , ""+e.getMessage());
+            APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage());
         }
-
-        APPORIOLOGS.debugLog(TAG , String.valueOf(AppInfoManager.getApplicafionInfo()));
-        APPORIOLOGS.debugLog(TAG , String.valueOf(NetworkInfoManager.getNetworkConnectionState(this)));
         selDevelopmentModeAccordingly(setDeveloperMode());
         gson = new GsonBuilder().create();
         small_Icon = setSmallNotificationIcons();
@@ -98,8 +95,8 @@ public abstract class ATSApplication extends Application  implements Application
 
     private void selDevelopmentModeAccordingly(boolean setDeveloperMode) {
 
-        if(setDeveloperMode){ APPORIOLOGS.informativeLog(TAG , "Application is in development mode"); }
-        else{ APPORIOLOGS.informativeLog(TAG , "Application is not in development mode"); }
+//        if(setDeveloperMode){ APPORIOLOGS.informativeLog(TAG , "Application is in development mode"); }
+//        else{ APPORIOLOGS.informativeLog(TAG , "Application is not in development mode"); }
 
         editor.putBoolean(DEVELOPER_MODE_KEY, setDeveloperMode);
         editor.commit();
@@ -168,8 +165,9 @@ public abstract class ATSApplication extends Application  implements Application
         isActivityChangingConfigurations = activity.isChangingConfigurations();
         if (--activityReferences == 0 && !isActivityChangingConfigurations) {
 //            Toast.makeText(activity, "Enters in background | Pending logs"+HyperLog.hasPendingDeviceLogs()+" | Log count:"+HyperLog.getDeviceLogsCount(), Toast.LENGTH_LONG).show();
-            APPORIOLOGS.debugLog(TAG , "Enters in Background");
-            try{syncLogsAccordingly();}catch (Exception e){}
+            try{syncLogsAccordingly();}catch (Exception e){
+                APPORIOLOGS.exceptionLog(TAG, ""+e.getMessage());
+            }
         }
     }
 
@@ -219,6 +217,7 @@ public abstract class ATSApplication extends Application  implements Application
         }
 
 
+        Log.d(TAG, "Syncing Logs to Log panel");
         AndroidNetworking.post("" + EndPoint)
                 .addJSONObjectBody(jsonObject)
                 .setTag(this)

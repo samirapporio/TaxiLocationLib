@@ -4,7 +4,7 @@ import android.location.Location;
 
 import org.json.JSONObject;
 
-public class EventLocation {
+public class AtsLocationEvent {
 
     public JSONObject location ;
     public Location pojolocation ;

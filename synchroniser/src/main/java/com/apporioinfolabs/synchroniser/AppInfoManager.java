@@ -26,7 +26,7 @@ public class AppInfoManager {
             jsonObject.put("permissions", getPermissionWithStatus());
 
         }catch (Exception e){
-            APPORIOLOGS.errorLog(TAG , ""+e.getMessage());
+            APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage());
         }
 
 
@@ -70,7 +70,7 @@ public class AppInfoManager {
 
             }
         }catch (Exception e){
-            APPORIOLOGS.errorLog(TAG , ""+e.getMessage());
+            APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage());
         }
         return permissionsarray ;
     }

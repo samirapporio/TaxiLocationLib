@@ -14,8 +14,12 @@ import android.os.Build;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
-import com.apporioinfolabs.synchroniser.db.SqliteDBHelper;
-import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
+
+import com.hypertrack.hyperlog.DeviceLogModel;
+import com.hypertrack.hyperlog.HyperLog;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AtsNotification {
@@ -30,7 +34,7 @@ public class AtsNotification {
     private NotificationManager manager ;
     private SharedPreferences sharedPref;
     private final String TAG = "AtsNotification";
-    private SqliteDBHelper sqliteDBHelper ;
+
 
 
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
@@ -39,7 +43,6 @@ public class AtsNotification {
 
     public AtsNotification(Context context){
         mContext = context ;
-        sqliteDBHelper = new SqliteDBHelper(context);
         sharedPref = context.getSharedPreferences(ATSApplication.SHARED_PREFRENCE, Context.MODE_PRIVATE);
         mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         mSmallRemoteViews = new RemoteViews(mContext.getPackageName(), R.layout.custom_notification_small);
@@ -111,13 +114,13 @@ public class AtsNotification {
         }
     }
 
-    private void updateDevelopmentNotificationView(EventLocation event){
+    private void updateDevelopmentNotificationView(AtsLocationEvent event){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             updateOreoAboveNotification(event.getPojolocation());
         }else{
             NotifyNotification("Development Mode"
                     , "Loc.:"+event.getPojolocation().getLatitude()+","+event.getPojolocation().getLongitude()+", Ac:"+event.getPojolocation().getAccuracy()
-                    , event.pojolocation,ATSApplication.getSocket().connected(),sqliteDBHelper.getAllOfflineStats().size());
+                    , event.pojolocation,ATSApplication.getSocket().connected(), getLocationLogsOnly().size());
         }
     }
 
@@ -174,13 +177,13 @@ public class AtsNotification {
         }
     }
 
-    private void updateReleasedNotificationView(EventLocation event) throws Exception{
+    private void updateReleasedNotificationView(AtsLocationEvent event) throws Exception{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             updateOreoAboveNotification(event.getPojolocation());
         }else{
             NotifyNotification(""+AppInfoManager.getApplicafionInfo().get("app_name")
                     , ""+ATSApplication.notificatioOnlineText
-                    , event.pojolocation,ATSApplication.getSocket().connected(),sqliteDBHelper.getAllOfflineStats().size());
+                    , event.pojolocation,ATSApplication.getSocket().connected(),getLocationLogsOnly().size());
         }
     }
 
@@ -205,7 +208,8 @@ public class AtsNotification {
                     +", Accuracy:"+location.getAccuracy()
                     +", Speed:"+location.getSpeed()+"m/sec"+ ",   Bearing:"+location.getBearing()
                     +", Socket state: "+(ATSApplication.getSocket().connected()? "Connected":"Disconnected")
-                    +", Local Cashed: "+sqliteDBHelper.getAllOfflineStats().size()));
+                    +", cashed Location : "+getLocationLogsOnly().size()
+                    +", Total Logs : "+HyperLog.getDeviceLogsCount()));
             manager.notify(1, mBuilder.build());
         } else {
 
@@ -229,7 +233,7 @@ public class AtsNotification {
             mBigRemoteViews.setTextViewText(R.id.location,   "Loc Interval: "+ATSApplication.locationFetchInterval+ ""+location.getLatitude()+","+location.getLongitude());
             mBigRemoteViews.setTextViewText(R.id.accuracy, String.format("%.2f", location.getAccuracy())   +" meter");
             mBigRemoteViews.setTextViewText(R.id.socket_connectivity, "Socket: "+ (socket_Status?"Connected":"Disconnected"));
-            mBigRemoteViews.setTextViewText(R.id.other_info, "Speed:"+location.getSpeed()+",  bearing:"+location.getBearing()+" m/sec"+", Cashed Data: "+totalCashedData);
+            mBigRemoteViews.setTextViewText(R.id.other_info, "Speed:"+location.getSpeed()+",  bearing:"+location.getBearing()+" m/sec"+", Total logs: "+totalCashedData);
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
                 mNotificationManager.notify(NOTIF_ID, mNotification);
             }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -264,7 +268,7 @@ public class AtsNotification {
 
     public void startNotificationView(Service service) throws Exception{
 
-        APPORIOLOGS.debugLog(TAG , "DEVELOPER MODE --->  "+sharedPref.getBoolean(ATSApplication.DEVELOPER_MODE_KEY, false));
+//        APPORIOLOGS.debugLog(TAG , "DEVELOPER MODE --->  "+sharedPref.getBoolean(ATSApplication.DEVELOPER_MODE_KEY, false));
 
         if (sharedPref.getBoolean(ATSApplication.DEVELOPER_MODE_KEY, false)) {
             startDevelopmentNotificationView(service);
@@ -273,7 +277,7 @@ public class AtsNotification {
         }
     }
 
-    public void updateNotificationView(EventLocation event) throws Exception{
+    public void updateNotificationView(AtsLocationEvent event) throws Exception{
         if (sharedPref.getBoolean(ATSApplication.DEVELOPER_MODE_KEY, false)) {
             updateDevelopmentNotificationView(event);
         } else {
@@ -283,6 +287,14 @@ public class AtsNotification {
     }
 
 
+    private List<DeviceLogModel> getLocationLogsOnly(){
+        List<DeviceLogModel> logs =  HyperLog.getDeviceLogs(false);
+        List<DeviceLogModel> flters = new ArrayList<>();
+        for(int i = 0 ; i < logs.size()  ; i++){
+            if(logs.get(i).getDeviceLog().contains("LOCATION_LOG")){flters.add(logs.get(i));}
+        }
+        return flters ;
+    }
 
 
 
