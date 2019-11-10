@@ -7,7 +7,8 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
+import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
+
 
 import org.json.JSONObject;
 

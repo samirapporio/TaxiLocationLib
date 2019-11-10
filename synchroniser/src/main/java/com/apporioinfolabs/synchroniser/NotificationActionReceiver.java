@@ -5,7 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
+import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 
 public class NotificationActionReceiver extends BroadcastReceiver {
 

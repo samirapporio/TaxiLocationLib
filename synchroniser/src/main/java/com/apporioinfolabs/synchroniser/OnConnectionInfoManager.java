@@ -1,6 +1,6 @@
 package com.apporioinfolabs.synchroniser;
 
-import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
+import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 
 import org.json.JSONObject;
 

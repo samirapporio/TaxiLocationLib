@@ -14,9 +14,8 @@ import android.os.Build;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
-
-import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
 import com.apporioinfolabs.synchroniser.db.SqliteDBHelper;
+import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 
 
 public class AtsNotification {

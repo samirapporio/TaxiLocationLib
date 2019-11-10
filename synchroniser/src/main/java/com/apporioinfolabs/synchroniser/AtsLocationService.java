@@ -9,10 +9,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
-
-import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
 import com.apporioinfolabs.synchroniser.db.OfflineDataTable;
 import com.apporioinfolabs.synchroniser.db.SqliteDBHelper;
+import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.github.abara.library.batterystats.BatteryStats;
 import com.google.gson.Gson;
 

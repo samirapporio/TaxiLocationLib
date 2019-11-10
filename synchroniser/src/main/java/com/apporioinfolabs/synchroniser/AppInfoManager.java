@@ -4,7 +4,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 
-import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
+
+import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

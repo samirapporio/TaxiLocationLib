@@ -7,7 +7,7 @@ import android.location.Location;
 
 import androidx.annotation.NonNull;
 
-import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
+import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;

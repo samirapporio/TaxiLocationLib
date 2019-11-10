@@ -4,7 +4,8 @@ import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
 
-import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
+
+import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.github.abara.library.batterystats.BatteryStats;
 
 import org.json.JSONObject;
