@@ -14,20 +14,19 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.hypertrack.hyperlog.DeviceLogModel;
-import com.hypertrack.hyperlog.HyperLog;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.List;
+
 import java.util.TimeZone;
 
-public abstract class ATSApplication extends Application implements Application.ActivityLifecycleCallbacks  {
+public abstract class ATSApplication extends Application   {
 
     private static Socket mSocket;
     private final String TAG = "ATSApplication";
@@ -87,20 +86,13 @@ public abstract class ATSApplication extends Application implements Application.
         notificatioMakingOnlineText = setNotificationMakingOnlineText();
         notificationClickIntent = setNotificationClickIntent() ;
         setIntervalRunningWhenVehicleStops = setIntervalRunningOnVehicleStop();
-        HyperLog.initialize(this);
-        HyperLog.setLogLevel(Log.VERBOSE);
-        HyperLog.setLogFormat(new CustomLogMessageFormat(this));
-//       HyperLog.setURL("http://13.233.98.63:3108/api/v1/logs/test");
-//      HyperLog.setURL("https://enendj05s50aq.x.pipedream.net");
-
         super.onCreate();
-        registerActivityLifecycleCallbacks(this);
     }
 
     private void selDevelopmentModeAccordingly(boolean setDeveloperMode) {
 
-        if(setDeveloperMode){ Log.i(TAG , "Application is in development mode"); }
-        else{ Log.i(TAG , "Application is not in development mode"); }
+        if(setDeveloperMode){ APPORIOLOGS.informativeLog(TAG , "Application is in development mode"); }
+        else{ APPORIOLOGS.informativeLog(TAG , "Application is not in development mode"); }
 
         editor.putBoolean(DEVELOPER_MODE_KEY, setDeveloperMode);
         editor.commit();
@@ -153,92 +145,6 @@ public abstract class ATSApplication extends Application implements Application.
             return sharedPref;
         }
     }
-
-    @Override
-    public void onActivityStarted(Activity activity) {
-        if (++activityReferences == 1 && !isActivityChangingConfigurations) {
-            Toast.makeText(activity, "Enters in foreground | Pending logs:"+ HyperLog.hasPendingDeviceLogs()+" | Log count:"+ HyperLog.getDeviceLogsCount(), Toast.LENGTH_LONG).show();
-            Log.d(TAG , "Enters in foreground");
-        }
-    }
-
-    @Override
-    public void onActivityStopped(Activity activity) {
-
-        isActivityChangingConfigurations = activity.isChangingConfigurations();
-        if (--activityReferences == 0 && !isActivityChangingConfigurations) {
-//            Toast.makeText(activity, "Enters in background | Pending logs"+HyperLog.hasPendingDeviceLogs()+" | Log count:"+HyperLog.getDeviceLogsCount(), Toast.LENGTH_LONG).show();
-            APPORIOLOGS.debugLog(TAG , "Enters in Background");
-            try{syncLogsAccordingly();}catch (Exception e){}
-        }
-    }
-
-
-    @Override
-    public void onActivityCreated(Activity activity, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onActivityResumed(Activity activity) {
-
-    }
-
-    @Override
-    public void onActivityPaused(Activity activity) {
-
-    }
-
-    @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onActivityDestroyed(Activity activity) {
-
-    }
-
-
-    private void syncLogsAccordingly() throws Exception{
-
-//        Toast.makeText(mContext, ""+HyperLog.getDeviceLogsInFile(this), Toast.LENGTH_SHORT).show();
-
-        //Extra header to post request
-        HashMap<String, String> params = new HashMap<>();
-        params.put("timezone", TimeZone.getDefault().getID());
-        List<DeviceLogModel> deviceLogModels = HyperLog.getDeviceLogs(false) ;
-
-
-        JSONObject jsonObject  = new JSONObject();
-
-        try{
-            jsonObject.put("key",gson.toJson(deviceLogModels));
-        }catch (Exception e){
-            Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-
-
-        AndroidNetworking.post("" + EndPoint)
-                .addJSONObjectBody(jsonObject)
-                .setTag(this)
-                .setPriority(Priority.HIGH)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(final JSONObject jsonObject) {
-                        HyperLog.deleteLogs();
-                    }
-
-                    @Override
-                    public void onError(ANError anError) {
-//                        Toast.makeText(ATSApplication.this, "ERROR :  "+anError.getErrorBody(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-
-
 
 
 }

@@ -1,5 +1,6 @@
 package com.apporioinfolabs.synchroniser;
 
+import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Ack;
 

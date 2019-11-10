@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
+
 public class NotificationActionReceiver extends BroadcastReceiver {
 
     public final static String ACTION_SYNC_CASHED = "sync_cashed";

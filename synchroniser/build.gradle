@@ -31,5 +31,5 @@ dependencies {
     implementation 'com.github.nkzawa:socket.io-client:0.6.0'
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
     implementation 'com.github.lvabarajithan:batterystatslibrary:1.0.0'
-    implementation 'com.hypertrack:hyperlog:0.0.10'
+    implementation 'com.github.samirapporio:ApporioLogSystem:1.2'
 }

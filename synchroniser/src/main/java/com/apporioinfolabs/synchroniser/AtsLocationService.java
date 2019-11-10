@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
 
+import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
 import com.apporioinfolabs.synchroniser.db.OfflineDataTable;
 import com.apporioinfolabs.synchroniser.db.SqliteDBHelper;
 import com.github.abara.library.batterystats.BatteryStats;

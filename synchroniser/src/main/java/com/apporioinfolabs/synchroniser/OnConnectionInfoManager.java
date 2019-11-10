@@ -1,5 +1,7 @@
 package com.apporioinfolabs.synchroniser;
 
+import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
+
 import org.json.JSONObject;
 
 public class OnConnectionInfoManager {

@@ -15,6 +15,7 @@ import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
+import com.apporioinfolabs.apporiologsystem.APPORIOLOGS;
 import com.apporioinfolabs.synchroniser.db.SqliteDBHelper;
 
 

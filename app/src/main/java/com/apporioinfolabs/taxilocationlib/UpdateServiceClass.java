@@ -2,7 +2,6 @@ package com.apporioinfolabs.taxilocationlib;
 
 import android.location.Location;
 
-import com.apporioinfolabs.synchroniser.APPORIOLOGS;
 import com.apporioinfolabs.synchroniser.AtsLocationService;
 
 public class UpdateServiceClass extends AtsLocationService {
