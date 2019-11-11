@@ -54,6 +54,7 @@ public abstract class ATSApplication extends Application  implements Application
     private boolean isActivityChangingConfigurations = false;
     private Gson gson ;
 
+//    public static final String EndPoint = "http://localhost:3108/api/v1/logs/add_log";
     public static final String EndPoint = "http://13.233.98.63:3108/api/v1/logs/add_log";
 
     @Override

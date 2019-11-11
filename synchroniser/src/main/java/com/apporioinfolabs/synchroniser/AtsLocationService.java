@@ -9,6 +9,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -17,12 +19,17 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.github.abara.library.batterystats.BatteryStats;
 import com.google.gson.Gson;
+import com.hypertrack.hyperlog.DeviceLogModel;
 import com.hypertrack.hyperlog.HyperLog;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -119,7 +126,8 @@ public abstract  class AtsLocationService extends Service  {
 
         if(ATSApplication.getSocket().connected()){
             APPORIOLOGS.debugLog(TAG , "Sending data from socket");
-//            List<OfflineDataTable> cashed_enteries =  sqliteDBHelper.getAllOfflineStats();
+
+            //            List<OfflineDataTable> cashed_enteries =  sqliteDBHelper.getAllOfflineStats();
 //            if(cashed_enteries.size() > 0){
 //                try{
 //                    SocketListeners.emitCashedLocation(jsonObject.put("cashed_data",gson.toJson(cashed_enteries)));
@@ -158,8 +166,15 @@ public abstract  class AtsLocationService extends Service  {
 //        }
 
         if(HyperLog.getDeviceLogsCount() >= 25){
+
+
+            HashMap<String, String> params = new HashMap<>();
+            params.put("timezone", TimeZone.getDefault().getID());
+            List<DeviceLogModel> mdevice_model = HyperLog.getDeviceLogs(false) ;
+            JSONObject mjsonobject  = new JSONObject();
+            try{ mjsonobject.put("key",gson.toJson(mdevice_model)); }catch (Exception e){ }
             AndroidNetworking.post("" + ATSApplication.EndPoint)
-                    .addJSONObjectBody(jsonObject)
+                    .addJSONObjectBody(mjsonobject)
                     .setTag(this)
                     .setPriority(Priority.HIGH)
                     .build()
@@ -173,6 +188,9 @@ public abstract  class AtsLocationService extends Service  {
                         public void onError(ANError anError) {
                         }
                     });
+
+
+
 
 
 

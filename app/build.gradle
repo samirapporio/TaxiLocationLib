@@ -24,4 +24,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation project(path: ':synchroniser')
     implementation 'com.github.samirapporio:ApporioLogSystem:1.2'
+    implementation 'com.amitshekhar.android:android-networking:1.0.2'
+
 }
