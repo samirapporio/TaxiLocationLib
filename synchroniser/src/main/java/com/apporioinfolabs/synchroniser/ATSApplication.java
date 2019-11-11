@@ -93,6 +93,7 @@ public abstract class ATSApplication extends Application  implements Application
         registerActivityLifecycleCallbacks(this);
     }
 
+
     private void selDevelopmentModeAccordingly(boolean setDeveloperMode) {
 
 //        if(setDeveloperMode){ APPORIOLOGS.informativeLog(TAG , "Application is in development mode"); }
@@ -154,7 +155,7 @@ public abstract class ATSApplication extends Application  implements Application
     @Override
     public void onActivityStarted(Activity activity) {
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
-            Toast.makeText(activity, "Enters in foreground | Pending logs:"+HyperLog.hasPendingDeviceLogs()+" | Log count:"+HyperLog.getDeviceLogsCount(), Toast.LENGTH_LONG).show();
+//            Toast.makeText(activity, "Enters in foreground | Pending logs:"+HyperLog.hasPendingDeviceLogs()+" | Log count:"+HyperLog.getDeviceLogsCount(), Toast.LENGTH_LONG).show();
             Log.d(TAG , "Enters in foreground");
         }
     }
