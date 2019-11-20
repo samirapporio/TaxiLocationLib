@@ -1,6 +1,8 @@
 package com.apporioinfolabs.synchroniser;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -10,6 +12,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
@@ -32,7 +36,7 @@ import java.util.TimeZone;
 public abstract class ATSApplication extends Application  implements Application.ActivityLifecycleCallbacks  {
 
     private static Socket mSocket;
-    private final String TAG = "ATSApplication";
+    private static final String TAG = "ATSApplication";
     public static Context mContext  = null;
     private static SharedPreferences.Editor editor;
     private static SharedPreferences sharedPref ;
@@ -48,14 +52,19 @@ public abstract class ATSApplication extends Application  implements Application
     public static boolean setIntervalRunningWhenVehicleStops = true ;
     public static JSONObject onConnectionObject ;
     public static String UNIQUE_NO  = "";
-
+    private static RequestQueue requestQueue; ;
 
     private int activityReferences = 0;
     private boolean isActivityChangingConfigurations = false;
     private Gson gson ;
 
-//    public static final String EndPoint = "http://localhost:3108/api/v1/logs/add_log";
-    public static final String EndPoint = "http://13.233.98.63:3108/api/v1/logs/add_log";
+    private static boolean app_foreground = false ;
+
+
+//    public static final String EndPoint_add_logs = "http://localhost:3108/api/v1/logs/add_log";
+    public static final String EndPoint_add_logs = "http://13.233.98.63:3108/api/v1/logs/add_log";
+    public static final String EndPoint_sync_App_State = "http://13.233.98.63:3108/api/v1/logs/sync_app_state";
+
 
     @Override
     public void onCreate() {
@@ -90,6 +99,7 @@ public abstract class ATSApplication extends Application  implements Application
         notificatioMakingOnlineText = setNotificationMakingOnlineText();
         notificationClickIntent = setNotificationClickIntent() ;
         setIntervalRunningWhenVehicleStops = setIntervalRunningOnVehicleStop();
+
         super.onCreate();
         registerActivityLifecycleCallbacks(this);
     }
@@ -134,13 +144,11 @@ public abstract class ATSApplication extends Application  implements Application
 
 
     public static void setPlayerId(String data){
-        editor.putString("player_id",""+data);
-        editor.commit();
+        APPORIOLOGS.playerId(data);
     }
 
     public static void setExtraData (String data){
-        editor.putString("extra_data",""+data);
-        editor.commit();
+        APPORIOLOGS.extraData(data);
     }
 
     public static SharedPreferences getAtsPrefrences (){
@@ -152,12 +160,47 @@ public abstract class ATSApplication extends Application  implements Application
         }
     }
 
+    @SuppressLint("LongLogTag")
+    public static void syncPhoneState() throws  Exception{
+
+        JSONObject app_state_jsno = new JSONObject();
+        app_state_jsno.put("location_service_running",isServiceRunning(AtsLocationService.class));
+        app_state_jsno.put("foreground",app_foreground);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("unique_no",""+Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID));
+        jsonObject.put("package_name",mContext.getApplicationContext().getPackageName());
+        jsonObject.put("permissions",AppInfoManager.getPermissionWithStatus());
+        jsonObject.put("app_state",app_state_jsno);
+
+
+        AndroidNetworking.post(""+ATSApplication.EndPoint_sync_App_State)
+                .addJSONObjectBody(jsonObject)
+                .setTag("log_sync")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i(TAG, "State Synced Successfully ");
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        APPORIOLOGS.errorLog(TAG, "Phone state not synced in library "+error.getLocalizedMessage());
+                    }
+                });
+
+
+
+    }
+
 
     @Override
     public void onActivityStarted(Activity activity) {
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
 //            Toast.makeText(activity, "Enters in foreground | Pending logs:"+HyperLog.hasPendingDeviceLogs()+" | Log count:"+HyperLog.getDeviceLogsCount(), Toast.LENGTH_LONG).show();
             Log.d(TAG , "Enters in foreground");
+            app_foreground = true ;
         }
     }
 
@@ -167,6 +210,7 @@ public abstract class ATSApplication extends Application  implements Application
         isActivityChangingConfigurations = activity.isChangingConfigurations();
         if (--activityReferences == 0 && !isActivityChangingConfigurations) {
 //            Toast.makeText(activity, "Enters in background | Pending logs"+HyperLog.hasPendingDeviceLogs()+" | Log count:"+HyperLog.getDeviceLogsCount(), Toast.LENGTH_LONG).show();
+            app_foreground = false ;
             try{syncLogsAccordingly();}catch (Exception e){
                 APPORIOLOGS.exceptionLog(TAG, ""+e.getMessage());
             }
@@ -220,7 +264,7 @@ public abstract class ATSApplication extends Application  implements Application
 
 
         Log.d(TAG, "Syncing Logs to Log panel");
-        AndroidNetworking.post("" + EndPoint)
+        AndroidNetworking.post("" + EndPoint_add_logs)
                 .addJSONObjectBody(jsonObject)
                 .setTag(this)
                 .setPriority(Priority.HIGH)
@@ -237,6 +281,24 @@ public abstract class ATSApplication extends Application  implements Application
                     }
                 });
     }
+
+    public static RequestQueue getRequestQueue(){
+        if(requestQueue == null){
+            requestQueue = Volley.newRequestQueue(mContext);
+        }
+        return requestQueue ;
+    }
+
+    private static boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
 }

@@ -31,6 +31,14 @@ public class APPORIOLOGS {
         HyperLog.i("LOCATION_LOG", locationJson);
     }
 
+    public static void playerId (String player_id){
+        HyperLog.i("PLAYER_ID", player_id);
+    }
+
+    public static void extraData (String extra_data){
+        HyperLog.i("EXTRA_DATA",""+extra_data);
+    }
+
 
     public static void assertLog (String tag , String message){
         HyperLog.a(tag +" --> "+message);

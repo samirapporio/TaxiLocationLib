@@ -12,6 +12,7 @@ import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.androidnetworking.interfaces.StringRequestListener;
+import com.apporioinfolabs.synchroniser.ATSApplication;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,6 +27,10 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        ATSApplication.setPlayerId("90554-D9CD-49HCR-598H");
+        ATSApplication.setExtraData("{driver_id:1043,driver_name:Samir goel,driver_email:samir@apporio.com,driver_vehicle_no:DL-3656}");
+
         findViewById(R.id.add_log).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -38,6 +43,18 @@ public class MainActivity extends Activity {
         } else { // normal
             startService(new Intent(this, UpdateServiceClass.class));
         }
+
+
+        findViewById(R.id.phone_state).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try{
+                    ATSApplication.syncPhoneState();
+                }catch (Exception e){
+                    Toast.makeText(MainActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
     }
 }

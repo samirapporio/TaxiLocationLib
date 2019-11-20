@@ -10,8 +10,6 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
-
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
@@ -19,21 +17,17 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.github.abara.library.batterystats.BatteryStats;
 import com.google.gson.Gson;
-import com.hypertrack.hyperlog.DeviceLogModel;
 import com.hypertrack.hyperlog.HyperLog;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.List;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public abstract  class AtsLocationService extends Service  {
+
 
     private final static String TAG = "AtsLocationService";
     private AtsLocationManager atsLocationManager ;
@@ -122,8 +116,6 @@ public abstract  class AtsLocationService extends Service  {
         editor.commit();
 
 
-
-
         if(ATSApplication.getSocket().connected()){
             APPORIOLOGS.debugLog(TAG , "Sending data from socket");
 
@@ -166,36 +158,13 @@ public abstract  class AtsLocationService extends Service  {
 //        }
 
         if(HyperLog.getDeviceLogsCount() >= 25){
-
-
-            HashMap<String, String> params = new HashMap<>();
-            params.put("timezone", TimeZone.getDefault().getID());
-            List<DeviceLogModel> mdevice_model = HyperLog.getDeviceLogs(false) ;
-            JSONObject mjsonobject  = new JSONObject();
-            try{ mjsonobject.put("key",gson.toJson(mdevice_model)); }catch (Exception e){ }
-            AndroidNetworking.post("" + ATSApplication.EndPoint)
-                    .addJSONObjectBody(mjsonobject)
-                    .setTag(this)
-                    .setPriority(Priority.HIGH)
-                    .build()
-                    .getAsJSONObject(new JSONObjectRequestListener() {
-                        @Override
-                        public void onResponse(final JSONObject jsonObject) {
-                            HyperLog.deleteLogs();
-                        }
-
-                        @Override
-                        public void onError(ANError anError) {
-                        }
-                    });
-
-
-
-
-
+            try{
+                syncLogs();
+            }catch (Exception e){
+                Log.e(TAG, "Exception while syncing: "+e.getMessage());
+            }
 
         }
-
 
         try{ atsNotification.updateNotificationView(event); }
         catch (Exception e){ APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage()); }
@@ -238,6 +207,31 @@ public abstract  class AtsLocationService extends Service  {
 
 
     public abstract void onReceiveLocation(Location location);
+
+
+    public void syncLogs() throws Exception{
+        Log.i(TAG, "Executing API for Syncing Logs");
+
+
+
+        AndroidNetworking.post(""+ATSApplication.EndPoint_add_logs)
+                .addBodyParameter("timezone", TimeZone.getDefault().getID())
+                .addBodyParameter("key",gson.toJson(HyperLog.getDeviceLogs(false)))
+                .setTag("log_sync")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i(TAG, "Logs Synced Successfully ");
+                        HyperLog.deleteLogs();
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        Log.e(TAG, "Logs Not synced "+error.getLocalizedMessage());
+                    }
+                });
+    }
 
 
 

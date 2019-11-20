@@ -5,12 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+
 
 
     <Button
@@ -18,5 +16,11 @@
         android:layout_height="wrap_content"
         android:text="Add Log"
         android:id="@+id/add_log"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get Phone State"
+        android:id="@+id/phone_state"/>
 
 </LinearLayout>
