@@ -29,6 +29,7 @@ import com.hypertrack.hyperlog.HyperLog;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -56,7 +57,7 @@ public abstract class ATSApplication extends Application  implements Application
 
     private int activityReferences = 0;
     private boolean isActivityChangingConfigurations = false;
-    private Gson gson ;
+    private static Gson gson ;
 
     private static boolean app_foreground = false ;
 
@@ -163,8 +164,11 @@ public abstract class ATSApplication extends Application  implements Application
     @SuppressLint("LongLogTag")
     public static void syncPhoneState() throws  Exception{
 
+        Log.d(""+TAG,"----> "+gson.toJson(getListofRunningServices()));
+
         JSONObject app_state_jsno = new JSONObject();
-        app_state_jsno.put("location_service_running",isServiceRunning(AtsLocationService.class));
+        app_state_jsno.put("location_service_running",isServiceRunning());
+        app_state_jsno.put("running_services", gson.toJson(getListofRunningServices()) );
         app_state_jsno.put("foreground",app_foreground);
 
         JSONObject jsonObject = new JSONObject();
@@ -289,15 +293,33 @@ public abstract class ATSApplication extends Application  implements Application
         return requestQueue ;
     }
 
-    private static boolean isServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+    private static boolean isServiceRunning() {
+
+        ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
+
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
+            if (service.service.getClassName().equals("com.apporioinfolabs.taxilocationlib.UpdateServiceClass")) {
                 return true;
             }
         }
         return false;
     }
+
+
+    private static List<String> getListofRunningServices(){
+        List<String> services = new ArrayList<>();
+        ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
+
+        List<ActivityManager.RunningServiceInfo> data = manager.getRunningServices(Integer.MAX_VALUE)  ;
+
+
+
+        for(int i =0 ; i < data.size() ; i++){
+            services.add(""+data.get(i).service.getClassName().replace("com.apporioinfolabs.taxilocationlib.",""));
+        }
+        return  services;
+    }
+
 
 
 

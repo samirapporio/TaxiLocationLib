@@ -1,10 +1,24 @@
 package com.apporioinfolabs.taxilocationlib;
 
 import android.app.PendingIntent;
+
 import com.apporioinfolabs.synchroniser.ATSApplication;
+import com.onesignal.OneSignal;
 
 
 public class MainApplication extends ATSApplication {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .setNotificationOpenedHandler(new MyNotificationOpenHandler())
+                .setNotificationReceivedHandler(new MyNotificationReceiverhandler())
+                .unsubscribeWhenNotificationsAreDisabled(true)
+                .init();
+    }
+
     @Override
     public boolean setDeveloperMode() {
         return true;

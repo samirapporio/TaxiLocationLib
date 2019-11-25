@@ -1,11 +1,18 @@
+apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
 apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
     defaultConfig {
+        manifestPlaceholders = [
+                onesignal_app_id: 'fde019aa-bd33-443f-9996-3835e4ad31e5',
+                // Project number pulled from dashboard, local value is ignored.
+                onesignal_google_project_number: 'REMOTE'
+        ]
+
         applicationId "com.apporioinfolabs.taxilocationlib"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -25,5 +32,8 @@ dependencies {
     implementation project(path: ':synchroniser')
     implementation 'com.github.samirapporio:ApporioLogSystem:1.2'
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
-
+    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+    implementation 'com.onesignal:OneSignal:[3.11.2, 3.99.99]'
 }
+
+apply plugin: 'com.google.gms.google-services'

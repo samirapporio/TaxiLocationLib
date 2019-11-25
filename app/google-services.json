@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "335251246696",
+    "firebase_url": "https://apporio-taxi-library.firebaseio.com",
+    "project_id": "apporio-taxi-library",
+    "storage_bucket": "apporio-taxi-library.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335251246696:android:784ed6a671919a4342b5dd",
+        "android_client_info": {
+          "package_name": "com.apporioinfolabs.taxilocationlib"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "335251246696-a17ogm5dgqepvn639h6cups6qouhljk0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.apporioinfolabs.taxilocationlib",
+            "certificate_hash": "cf5b1a4ab6f28246a0f163a90397f6d3b2fdf30c"
+          }
+        },
+        {
+          "client_id": "335251246696-chvrgg9a49nth7si2brkroarbcmujr2d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHNBsHdKU2ewvCuRiXW4ZYdSfagR-VOtk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "335251246696-chvrgg9a49nth7si2brkroarbcmujr2d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
