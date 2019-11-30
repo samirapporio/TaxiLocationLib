@@ -9,12 +9,17 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.StringRequestListener;
 import com.apporioinfolabs.synchroniser.ATSApplication;
 import com.apporioinfolabs.synchroniser.AtsLocationService;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.onesignal.OSSubscriptionObserver;
 import com.onesignal.OSSubscriptionStateChanges;
 import com.onesignal.OneSignal;
+
+import org.json.JSONObject;
 
 public class MainActivity extends Activity implements OSSubscriptionObserver {
 
@@ -41,6 +46,13 @@ public class MainActivity extends Activity implements OSSubscriptionObserver {
         }
 
 
+
+
+
+
+
+
+
         Toast.makeText(this, ""+isServiceRunning(UpdateServiceClass.class), Toast.LENGTH_SHORT).show();
 
         findViewById(R.id.phone_state).setOnClickListener(new View.OnClickListener() {
@@ -60,6 +72,10 @@ public class MainActivity extends Activity implements OSSubscriptionObserver {
     public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
         Toast.makeText(this, ""+stateChanges.toString(), Toast.LENGTH_SHORT).show();
     }
+
+
+
+
 
 
     private  boolean isServiceRunning(Class<?> serviceClass) {

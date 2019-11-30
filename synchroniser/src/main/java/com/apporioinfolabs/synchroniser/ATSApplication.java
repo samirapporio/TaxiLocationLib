@@ -248,42 +248,26 @@ public abstract class ATSApplication extends Application  implements Application
     }
 
 
-    private void syncLogsAccordingly() throws Exception{
-
-//        Toast.makeText(mContext, ""+HyperLog.getDeviceLogsInFile(this), Toast.LENGTH_SHORT).show();
-
-        //Extra header to post request
-        HashMap<String, String> params = new HashMap<>();
-        params.put("timezone", TimeZone.getDefault().getID());
-        List<DeviceLogModel> deviceLogModels = HyperLog.getDeviceLogs(false) ;
-
-
-        JSONObject jsonObject  = new JSONObject();
-
-        try{
-            jsonObject.put("key",gson.toJson(deviceLogModels));
-        }catch (Exception e){
-            Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-
-
+    public static void syncLogsAccordingly() throws Exception{
         Log.d(TAG, "Syncing Logs to Log panel");
-        AndroidNetworking.post("" + EndPoint_add_logs)
-                .addJSONObjectBody(jsonObject)
-                .setTag(this)
+        AndroidNetworking.post(""+ATSApplication.EndPoint_add_logs)
+                .addBodyParameter("timezone", TimeZone.getDefault().getID())
+                .addBodyParameter("key",gson.toJson(HyperLog.getDeviceLogs(false)))
+                .setTag("log_sync")
                 .setPriority(Priority.HIGH)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(final JSONObject jsonObject) {
+                    public void onResponse(JSONObject response) {
+                        Log.i(TAG, "Logs Synced Successfully ");
                         HyperLog.deleteLogs();
                     }
-
                     @Override
-                    public void onError(ANError anError) {
-//                        Toast.makeText(ATSApplication.this, "ERROR :  "+anError.getErrorBody(), Toast.LENGTH_SHORT).show();
+                    public void onError(ANError error) {
+                        Log.e(TAG, "Logs Not synced "+error.getLocalizedMessage());
                     }
                 });
+
     }
 
     public static RequestQueue getRequestQueue(){
