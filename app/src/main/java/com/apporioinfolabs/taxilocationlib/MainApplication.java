@@ -1,6 +1,7 @@
 package com.apporioinfolabs.taxilocationlib;
 
 import android.app.PendingIntent;
+import android.widget.Toast;
 
 import com.apporioinfolabs.synchroniser.ATSApplication;
 import com.onesignal.OneSignal;
@@ -57,5 +58,17 @@ public class MainApplication extends ATSApplication {
     @Override
     public boolean setIntervalRunningOnVehicleStop() {
         return true;
+    }
+
+    @Override
+    public String dataSynced(String data) {
+        Toast.makeText(this, ""+data, Toast.LENGTH_SHORT).show();
+        return data;
+    }
+
+    @Override
+    public String dataSyncedError(String s) {
+        Toast.makeText(this, "Error in syncing data by library", Toast.LENGTH_SHORT).show();
+        return s;
     }
 }

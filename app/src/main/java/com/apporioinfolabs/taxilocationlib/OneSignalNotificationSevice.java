@@ -1,21 +1,14 @@
 package com.apporioinfolabs.taxilocationlib;
 
 import android.annotation.SuppressLint;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
 import android.util.Log;
 
-import com.androidnetworking.AndroidNetworking;
 import com.apporioinfolabs.synchroniser.ATSApplication;
 import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationReceivedResult;
 import com.onesignal.OneSignal;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class OneSignalNotificationSevice extends NotificationExtenderService {
 

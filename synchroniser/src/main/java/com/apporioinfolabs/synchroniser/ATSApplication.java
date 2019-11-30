@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
-public abstract class ATSApplication extends Application  implements Application.ActivityLifecycleCallbacks  {
+public abstract class ATSApplication extends Application  implements Application.ActivityLifecycleCallbacks, ApiSynchroniesr.OnSync  {
 
     private static Socket mSocket;
     private static final String TAG = "ATSApplication";
@@ -60,6 +60,7 @@ public abstract class ATSApplication extends Application  implements Application
     private static Gson gson ;
 
     private static boolean app_foreground = false ;
+    private static ApiSynchroniesr apiSynchroniesr ;
 
 
 //    public static final String EndPoint_add_logs = "http://localhost:3108/api/v1/logs/add_log";
@@ -91,6 +92,7 @@ public abstract class ATSApplication extends Application  implements Application
         }
         selDevelopmentModeAccordingly(setDeveloperMode());
         gson = new GsonBuilder().create();
+        apiSynchroniesr = new ApiSynchroniesr(this);
         small_Icon = setSmallNotificationIcons();
         large_icon = setLargeNotificationIcons() ;
         long minterval = setLocationFetchInterval();
@@ -103,6 +105,16 @@ public abstract class ATSApplication extends Application  implements Application
 
         super.onCreate();
         registerActivityLifecycleCallbacks(this);
+    }
+
+
+    public static Gson getGson(){
+        if(gson == null){
+            gson = new GsonBuilder().create();
+            return gson ;
+        }else{
+            return gson ;
+        }
     }
 
 
@@ -161,6 +173,10 @@ public abstract class ATSApplication extends Application  implements Application
         }
     }
 
+    public  abstract String dataSynced(String s);
+
+    public abstract String dataSyncedError(String s);
+
     @SuppressLint("LongLogTag")
     public static void syncPhoneState() throws  Exception{
 
@@ -177,25 +193,7 @@ public abstract class ATSApplication extends Application  implements Application
         jsonObject.put("permissions",AppInfoManager.getPermissionWithStatus());
         jsonObject.put("app_state",app_state_jsno);
 
-
-        AndroidNetworking.post(""+ATSApplication.EndPoint_sync_App_State)
-                .addJSONObjectBody(jsonObject)
-                .setTag("log_sync")
-                .setPriority(Priority.HIGH)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i(TAG, "State Synced Successfully ");
-                    }
-                    @Override
-                    public void onError(ANError error) {
-                        APPORIOLOGS.errorLog(TAG, "Phone state not synced in library "+error.getLocalizedMessage());
-                    }
-                });
-
-
-
+        apiSynchroniesr.syncPhoneState(jsonObject);
     }
 
 
@@ -248,26 +246,10 @@ public abstract class ATSApplication extends Application  implements Application
     }
 
 
-    public static void syncLogsAccordingly() throws Exception{
-        Log.d(TAG, "Syncing Logs to Log panel");
-        AndroidNetworking.post(""+ATSApplication.EndPoint_add_logs)
-                .addBodyParameter("timezone", TimeZone.getDefault().getID())
-                .addBodyParameter("key",gson.toJson(HyperLog.getDeviceLogs(false)))
-                .setTag("log_sync")
-                .setPriority(Priority.HIGH)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i(TAG, "Logs Synced Successfully ");
-                        HyperLog.deleteLogs();
-                    }
-                    @Override
-                    public void onError(ANError error) {
-                        Log.e(TAG, "Logs Not synced "+error.getLocalizedMessage());
-                    }
-                });
 
+    public  static void syncLogsAccordingly() throws Exception{
+        Log.d(TAG, "Syncing Logs to Log panel");
+        apiSynchroniesr.syncLogsAccordingly();
     }
 
     public static RequestQueue getRequestQueue(){
@@ -305,6 +287,13 @@ public abstract class ATSApplication extends Application  implements Application
     }
 
 
+    @Override
+    public void onSyncSuccess(String action) {
+        dataSynced(action);
+    }
 
-
+    @Override
+    public void onSyncError(String error) {
+        dataSyncedError(error);
+    }
 }

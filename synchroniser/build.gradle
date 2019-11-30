@@ -21,7 +21,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {
@@ -32,6 +31,6 @@ dependencies {
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
     implementation 'com.github.lvabarajithan:batterystatslibrary:1.0.0'
     implementation 'com.hypertrack:hyperlog:0.0.10'
-//    implementation 'com.android.volley:volley:1.1.1'
+//  implementation 'com.android.volley:volley:1.1.1'
 
 }
