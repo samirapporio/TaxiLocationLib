@@ -51,6 +51,12 @@ public abstract  class AtsLocationService extends Service  {
     private Timer mTimer = null;
 
     @Override
+    public void onStart(Intent intent, int startId) {
+        super.onStart(intent, startId);
+
+    }
+
+    @Override
     public void onCreate() {
         gson = new Gson();
         jsonObject = new JSONObject();
@@ -78,7 +84,7 @@ public abstract  class AtsLocationService extends Service  {
             mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), 0, ATSApplication.locationFetchInterval);
         }
 
-
+        ATSApplication.syncActions("start_location_service");
         super.onCreate();
     }
 
@@ -203,11 +209,10 @@ public abstract  class AtsLocationService extends Service  {
         atsLocationManager.stopLocationUpdates();
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+        ATSApplication.syncActions("stop_location_service");
     }
 
-
     public abstract void onReceiveLocation(Location location);
-
 
     public void syncLogs() throws Exception{
         Log.i(TAG, "Executing API for Syncing Logs");
@@ -233,8 +238,6 @@ public abstract  class AtsLocationService extends Service  {
                 });
     }
 
-
-
      class TimeDisplayTimerTask extends TimerTask{
         @Override
         public void run() {
@@ -247,10 +250,6 @@ public abstract  class AtsLocationService extends Service  {
 //            APPORIOLOGS.debugLog(""+TAG,"Sending location to developer code for running API : (When setIntervalRunningWhenVehicleStops = True)");
         }
     }
-
-
-
-
 
 
 }

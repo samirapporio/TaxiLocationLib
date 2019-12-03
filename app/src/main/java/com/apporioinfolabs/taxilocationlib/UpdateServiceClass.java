@@ -1,8 +1,8 @@
 package com.apporioinfolabs.taxilocationlib;
 
 import android.location.Location;
+
 import com.apporioinfolabs.synchroniser.AtsLocationService;
-import com.onesignal.OneSignal;
 
 public class UpdateServiceClass extends AtsLocationService {
     @Override

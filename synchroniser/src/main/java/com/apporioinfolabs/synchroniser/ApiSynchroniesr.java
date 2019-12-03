@@ -36,12 +36,12 @@ public class ApiSynchroniesr {
                     public void onResponse(JSONObject response) {
                         Log.i(TAG, "Logs Synced Successfully ");
                         HyperLog.deleteLogs();
-                        onSync.onSyncSuccess("logs_synced");
+                        onSync.onSyncSuccess(""+AtsConstants.SYNC_ESISTING_LOGS);
                     }
                     @Override
                     public void onError(ANError error) {
-                        Log.e(TAG, "Logs Not synced "+error.getLocalizedMessage());
-                        onSync.onSyncError("error_logs_in_syncing");
+                        Log.e(TAG, "Logs Not synced with error code: "+error.getErrorCode());
+                        onSync.onSyncError(""+AtsConstants.SYNC_ESISTING_LOGS_ERROR);
                     }
                 });
     }
@@ -59,12 +59,35 @@ public class ApiSynchroniesr {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.i(TAG, "State Synced Successfully ");
-                        onSync.onSyncSuccess("state_synced");
+                        onSync.onSyncSuccess(""+AtsConstants.SYNC_APP_STATE);
                     }
                     @Override
                     public void onError(ANError error) {
                         APPORIOLOGS.errorLog(TAG, "Phone state not synced in library "+error.getLocalizedMessage());
-                        onSync.onSyncError("state_sync_error");
+                        onSync.onSyncError(""+AtsConstants.SYNC_APP_STATE_ERROR);
+                    }
+                });
+
+    }
+
+    public void syncStraightAction(final String action ){
+
+
+        AndroidNetworking.post(""+ATSApplication.EndPoint_add_logs)
+                .addBodyParameter("timezone", TimeZone.getDefault().getID())
+                .addBodyParameter("action",""+action)
+                .setTag("syncing")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        onSync.onSyncSuccess(""+action);
+                    }
+                    @Override
+                    public void onError(ANError error) {
+
+                        onSync.onSyncError("Error while syncing action"+error.getErrorCode());
                     }
                 });
 

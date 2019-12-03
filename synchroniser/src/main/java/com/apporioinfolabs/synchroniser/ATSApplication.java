@@ -196,6 +196,10 @@ public abstract class ATSApplication extends Application  implements Application
         apiSynchroniesr.syncPhoneState(jsonObject);
     }
 
+    public static void syncActions(String action){
+        apiSynchroniesr.syncStraightAction(action);
+    }
+
 
     @Override
     public void onActivityStarted(Activity activity) {

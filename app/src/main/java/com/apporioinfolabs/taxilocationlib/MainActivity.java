@@ -32,6 +32,22 @@ public class MainActivity extends Activity implements OSSubscriptionObserver {
         ATSApplication.setPlayerId(""+OneSignal.getPermissionSubscriptionState().getSubscriptionStatus().getUserId());
         ATSApplication.setExtraData("{driver_id:1043,driver_name:Samir goel,driver_email:samir@apporio.com,driver_vehicle_no:DL-3656}");
 
+
+
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        APPORIOLOGS.debugLog("MainActivity","Some Log");
+
         findViewById(R.id.add_log).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -45,15 +61,6 @@ public class MainActivity extends Activity implements OSSubscriptionObserver {
             startService(new Intent(this, UpdateServiceClass.class));
         }
 
-
-
-
-
-
-
-
-
-        Toast.makeText(this, ""+isServiceRunning(UpdateServiceClass.class), Toast.LENGTH_SHORT).show();
 
         findViewById(R.id.phone_state).setOnClickListener(new View.OnClickListener() {
             @Override
