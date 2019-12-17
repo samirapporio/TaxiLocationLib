@@ -1,5 +1,7 @@
 package com.apporioinfolabs.synchroniser;
 
+import android.util.Log;
+
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Ack;
@@ -13,25 +15,17 @@ public class SocketListeners {
     public static final String CONNECT_DEVICE = "connect_device" ;
     public static final String DEVICE_LOCATION = "device_location" ;
     public static final String CASHED_LOCATION = "cashed_location" ;
-    public static final String TRIAL_LISTENER = "trial_listener" ;
-    public static final String ADD_DEVICE_IN_LIST= "add_device_in_list" ;
-    public static final String REMOVE_DEVICE_FROM_LIST= "remove_device_from_list" ;
-
-
-
-    public static Emitter.Listener onNewMessage = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            APPORIOLOGS.debugLog(TAG , "DATA  incoming ");
-        }
-    };
+    public static final String REQUEST_LISTENER = "request_listener" ;
+    public static final String REMOVE_LISTENER = "remove_listener" ;
 
 
 
     public static Emitter.Listener onConnect = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            APPORIOLOGS.debugLog(TAG , "Connected to socket server and emitting device info ");
+            ATSApplication.IS_SOCKET_CONNECTED = true;
+            Log.d(TAG, "Connected to socket server and emitting device info ");
+            EventBus.getDefault().post(""+AtsEventBus.SOCKET_CONNECTED);
             ATSApplication.getSocket().emit(CONNECT_DEVICE, OnConnectionInfoManager.getDeviceAndApplicationInfo(), new Ack() {
                 @Override
                 public void call(Object... args) {
@@ -47,39 +41,9 @@ public class SocketListeners {
     public static Emitter.Listener onDisconnected = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            APPORIOLOGS.debugLog(TAG , "Disconnected to socket server");
-        }
-    };
-
-
-    ////// Listeners
-
-    public static Emitter.Listener onTrialEvent = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            Ack ack = (Ack)args[args.length -1];
-            ack.call();
-            APPORIOLOGS.debugLog(TAG , "Add Device To List");
-        }
-    };
-
-
-    public static Emitter.Listener onAddDeviceInList = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            Ack ack = (Ack)args[args.length -1];
-            ack.call();
-            APPORIOLOGS.debugLog(TAG , "RECEIVED Connected Devices");
-        }
-    };
-
-
-    public static Emitter.Listener onRemoveDeviceFromList= new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            Ack ack = (Ack)args[args.length -1];
-            ack.call();
-            APPORIOLOGS.debugLog(TAG , "Remove some device from list");
+            ATSApplication.IS_SOCKET_CONNECTED = false;
+            Log.d(TAG , "Disconnected to socket server");
+            EventBus.getDefault().post(""+AtsEventBus.SOCKET_DISCONNECTED);
         }
     };
 
@@ -91,7 +55,7 @@ public class SocketListeners {
         ATSApplication.getSocket().emit(DEVICE_LOCATION, location, new Ack() {
             @Override
             public void call(Object... args) {
-                APPORIOLOGS.informativeLog(TAG, " - - "+ args[0]);
+                Log.i(TAG, " - - "+ args[0]);
 
             }
         });

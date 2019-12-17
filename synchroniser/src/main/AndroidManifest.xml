@@ -18,6 +18,9 @@
         <activity android:name=".ATSLocationActivity"></activity>
         <receiver android:name=".NotificationActionReceiver" />
 
+
+
+
     </application>
 
 

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -48,7 +49,7 @@ public class AtsLocationManager {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null) {
-                    APPORIOLOGS.debugLog(TAG, "Getting null Location");
+                    Log.d(TAG, "Getting null Location");
                     return;
                 }
                 for (Location location : locationResult.getLocations()) {
@@ -80,7 +81,7 @@ public class AtsLocationManager {
         task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                APPORIOLOGS.informativeLog(TAG, "Location Settings are satisfied");
+                Log.i(TAG, "Location Settings are satisfied");
             }
         });
 
@@ -88,7 +89,7 @@ public class AtsLocationManager {
         task.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-               APPORIOLOGS.errorLog(TAG, "Location Settings are not satisfied , Please show some dialog over this event to take location properly");
+               Log.e(TAG, "Location Settings are not satisfied , Please show some dialog over this event to take location properly");
             }
         });
 
@@ -97,13 +98,13 @@ public class AtsLocationManager {
 
     public void startLocationUpdates() {
         if(fusedLocationClient == null){
-           APPORIOLOGS.errorLog(TAG , "Fused Location Client haven't yet created.");
+            Log.e(TAG , "Fused Location Client haven't yet created.");
         }else{
             if (checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-               APPORIOLOGS.errorLog(TAG, "Found Location permission are missing ");
+                Log.e(TAG, "Found Location permission are missing ");
                 return;
             }else{
-                APPORIOLOGS.informativeLog(TAG , "Location service started");
+                Log.i(TAG , "Location service started");
                 fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null /* Looper */);
             }
         }

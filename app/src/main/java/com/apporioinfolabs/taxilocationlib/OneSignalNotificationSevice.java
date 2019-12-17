@@ -18,24 +18,32 @@ public class OneSignalNotificationSevice extends NotificationExtenderService {
     @SuppressLint("LongLogTag")
     @Override
     protected boolean onNotificationProcessing(OSNotificationReceivedResult receivedResult) {
-        Log.d(TAG , "Notification Id "+receivedResult.payload.notificationID);
+//        Log.d(TAG , "Notification"+receivedResult.payload.notificationID);
+        String action = "default";
         if(receivedResult.payload.additionalData != null){
+
+            Log.d(TAG , "---------> "+receivedResult.payload.additionalData);
+
             try {
-                Log.i(""+TAG,"Received notification "+receivedResult.payload.additionalData.getString("action") );
-                Log.i(""+TAG,"Player ID which needs to acknowledge "+receivedResult.payload.additionalData.getString("player_id") );
-                MainApplication.targetPlayerIdNotification = ""+receivedResult.payload.additionalData.getString("player_id");
+                action = ""+receivedResult.payload.additionalData.getString("action" );
                 doActioAccordingToState (""+receivedResult.payload.additionalData.getString("action"));
+                MainApplication.targetPlayerIdNotification = ""+receivedResult.payload.additionalData.getString("player_id");
             } catch (Exception e) {
                 Log.e(TAG , ""+e.getMessage());
             }
         }
-        return true;
+//        if(action.equals(AtsConstants.CLEAR_ONE_SIGNAL_NOTIFICATIONS)){
+//            return true ;
+//        }else{
+//            return false;
+//        }
+        return false ;
     }
 
 
     @SuppressLint("LongLogTag")
     private void doActioAccordingToState(String action) throws Exception {
-
+        OneSignal.clearOneSignalNotifications();
         switch (action){
             case ""+ AtsConstants.SYNC_APP_STATE:
                 Log.i(TAG , "Need to sync App state here accordingly ");

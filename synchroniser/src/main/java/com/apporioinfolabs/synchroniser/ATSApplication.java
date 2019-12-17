@@ -5,8 +5,12 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -18,6 +22,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.apporioinfolabs.synchroniser.db.SqliteDBHelper;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.apporioinfolabs.synchroniser.logssystem.CustomLogMessageFormat;
 import com.github.nkzawa.socketio.client.IO;
@@ -53,19 +58,33 @@ public abstract class ATSApplication extends Application  implements Application
     public static boolean setIntervalRunningWhenVehicleStops = true ;
     public static JSONObject onConnectionObject ;
     public static String UNIQUE_NO  = "";
-    private static RequestQueue requestQueue; ;
-
+    public static boolean IS_SOCKET_CONNECTED = false ;
+    public static int BatteryLevel ;
     private int activityReferences = 0;
     private boolean isActivityChangingConfigurations = false;
     private static Gson gson ;
-
     private static boolean app_foreground = false ;
     private static ApiSynchroniesr apiSynchroniesr ;
+    private static SqliteDBHelper sqliteDBHelper = null ;
 
 
 //    public static final String EndPoint_add_logs = "http://localhost:3108/api/v1/logs/add_log";
-    public static final String EndPoint_add_logs = "http://13.233.98.63:3108/api/v1/logs/add_log";
+    public static final String EndPoint_add_logs = "http://13.233.98.63:3108/api/v1/logs/save_log";
+    public static final String EndPoint_sync_log_file = "http://13.233.98.63:3108/api/v1/logs/savefile";
     public static final String EndPoint_sync_App_State = "http://13.233.98.63:3108/api/v1/logs/sync_app_state";
+//    public static final String EndPoint_socket = "http://192.168.1.33:3005"; // development server Apporio Airtel_5Ghz
+    public static final String EndPoint_socket = "http://13.233.98.63:3005";  // live server TBPO
+
+
+
+    private BroadcastReceiver mBatInfoReceiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context ctxt, Intent intent) {
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+            BatteryLevel = level ;
+//            batteryTxt.setText(String.valueOf(level) + "%");
+        }
+    };
 
 
     @Override
@@ -76,20 +95,12 @@ public abstract class ATSApplication extends Application  implements Application
         HyperLog.setLogLevel(Log.VERBOSE);
         HyperLog.setLogFormat(new CustomLogMessageFormat(this));
         sharedPref = this.getSharedPreferences(SHARED_PREFRENCE, Context.MODE_PRIVATE);
+        sqliteDBHelper = new SqliteDBHelper(this);
         editor = sharedPref.edit();
         onConnectionObject = new JSONObject();
         UNIQUE_NO = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        try{
-            connectToSocketServer();
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                this.startForegroundService(new Intent(this, AtsLocationService.class));
-//            }else{ // normal
-//                this.startService(new Intent(this, AtsLocationService.class));
-//            }
-        }
-        catch (Exception e){
-            APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage());
-        }
+        try{ connectToSocketServer(); }
+        catch (Exception e){ Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show(); }
         selDevelopmentModeAccordingly(setDeveloperMode());
         gson = new GsonBuilder().create();
         apiSynchroniesr = new ApiSynchroniesr(this);
@@ -102,8 +113,8 @@ public abstract class ATSApplication extends Application  implements Application
         notificatioMakingOnlineText = setNotificationMakingOnlineText();
         notificationClickIntent = setNotificationClickIntent() ;
         setIntervalRunningWhenVehicleStops = setIntervalRunningOnVehicleStop();
-
         super.onCreate();
+        this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         registerActivityLifecycleCallbacks(this);
     }
 
@@ -117,6 +128,16 @@ public abstract class ATSApplication extends Application  implements Application
         }
     }
 
+    public static SqliteDBHelper getSqlLite(){
+        if(sqliteDBHelper == null){
+            sqliteDBHelper = new SqliteDBHelper(mContext);
+            return sqliteDBHelper ;
+
+        }else{
+            return sqliteDBHelper ;
+        }
+    }
+
 
     private void selDevelopmentModeAccordingly(boolean setDeveloperMode) {
 
@@ -127,6 +148,7 @@ public abstract class ATSApplication extends Application  implements Application
         editor.commit();
 
     }
+
     public abstract boolean setDeveloperMode();
     public abstract int setSmallNotificationIcons() ;
     public abstract int setLargeNotificationIcons() ;
@@ -144,15 +166,21 @@ public abstract class ATSApplication extends Application  implements Application
         return mSocket ;
     }
 
-    private void connectToSocketServer() throws Exception{
-        mSocket = IO.socket("http://13.234.252.30:3002");
+    public void connectToSocketServer() throws Exception{
+        mSocket = IO.socket(""+EndPoint_socket);
         mSocket.on("connect", SocketListeners.onConnect);
-        mSocket.on("new message", SocketListeners.onNewMessage);
         mSocket.on("disconnect", SocketListeners.onDisconnected);
-        mSocket.on(""+SocketListeners.TRIAL_LISTENER, SocketListeners.onTrialEvent);
-        mSocket.on(""+SocketListeners.ADD_DEVICE_IN_LIST, SocketListeners.onAddDeviceInList);
-        mSocket.on(""+SocketListeners.REMOVE_DEVICE_FROM_LIST, SocketListeners.onRemoveDeviceFromList);
         mSocket.connect();
+    }
+
+    private static void reConnectToBasicRequiredListeners(){
+        mSocket.on("connect", SocketListeners.onConnect);
+        mSocket.on("disconnect", SocketListeners.onDisconnected);
+    }
+
+    public static void removePreviousListeners(){
+        mSocket.off();
+        reConnectToBasicRequiredListeners();
     }
 
 
@@ -171,6 +199,25 @@ public abstract class ATSApplication extends Application  implements Application
         }else{
             return sharedPref;
         }
+    }
+
+    public static void saveLocationInTempSession(double latitude, double longitude, float accuracy, float bearing){
+        editor.putString(""+AtsConstants.SessionKeys.Latitude,""+latitude);
+        editor.putString(""+AtsConstants.SessionKeys.Longitude,""+longitude);
+        editor.putString(""+AtsConstants.SessionKeys.Accuracy,""+accuracy);
+        editor.putString(""+AtsConstants.SessionKeys.Bearing,""+bearing);
+        editor.commit();
+    }
+
+    public static HashMap<String, String> getLocationFromTempSession(){
+        HashMap<String, String > temp_location = new HashMap<>();
+        SharedPreferences sp = getAtsPrefrences();
+        temp_location.put(""+AtsConstants.SessionKeys.Provider,""+sp.getString("PROVIDER", "NA"));
+        temp_location.put(""+AtsConstants.SessionKeys.Latitude,""+sp.getString("LAT","0.0"));
+        temp_location.put(""+AtsConstants.SessionKeys.Longitude,""+sp.getString("LONG","0.0"));
+        temp_location.put(""+AtsConstants.SessionKeys.Accuracy,""+sp.getString("ACCURACY","0.0"));
+        temp_location.put(""+AtsConstants.SessionKeys.Bearing,""+sp.getString("BEARING","0.0"));
+        return temp_location ;
     }
 
     public  abstract String dataSynced(String s);
@@ -220,6 +267,7 @@ public abstract class ATSApplication extends Application  implements Application
             try{syncLogsAccordingly();}catch (Exception e){
                 APPORIOLOGS.exceptionLog(TAG, ""+e.getMessage());
             }
+            removePreviousListeners();
         }
     }
 
@@ -250,18 +298,11 @@ public abstract class ATSApplication extends Application  implements Application
     }
 
 
-
     public  static void syncLogsAccordingly() throws Exception{
         Log.d(TAG, "Syncing Logs to Log panel");
         apiSynchroniesr.syncLogsAccordingly();
     }
 
-    public static RequestQueue getRequestQueue(){
-        if(requestQueue == null){
-            requestQueue = Volley.newRequestQueue(mContext);
-        }
-        return requestQueue ;
-    }
 
     private static boolean isServiceRunning() {
 
@@ -276,17 +317,16 @@ public abstract class ATSApplication extends Application  implements Application
     }
 
 
-    private static List<String> getListofRunningServices(){
+    public static List<String> getListofRunningServices(){
         List<String> services = new ArrayList<>();
         ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
 
         List<ActivityManager.RunningServiceInfo> data = manager.getRunningServices(Integer.MAX_VALUE)  ;
 
-
-
         for(int i =0 ; i < data.size() ; i++){
             services.add(""+data.get(i).service.getClassName().replace("com.apporioinfolabs.taxilocationlib.",""));
         }
+
         return  services;
     }
 
@@ -300,4 +340,7 @@ public abstract class ATSApplication extends Application  implements Application
     public void onSyncError(String error) {
         dataSyncedError(error);
     }
+
+
+
 }

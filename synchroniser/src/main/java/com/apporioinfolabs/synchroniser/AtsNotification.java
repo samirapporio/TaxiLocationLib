@@ -208,8 +208,10 @@ public class AtsNotification {
                     +", Accuracy:"+location.getAccuracy()
                     +", Speed:"+location.getSpeed()+"m/sec"+ ",   Bearing:"+location.getBearing()
                     +", Socket state: "+(ATSApplication.getSocket().connected()? "Connected":"Disconnected")
+                    +", BTR:"+ATSApplication.BatteryLevel
                     +", cashed Location : "+getLocationLogsOnly().size()
-                    +", Total Logs : "+HyperLog.getDeviceLogsCount()));
+                    +", Total Logs : "+HyperLog.getDeviceLogsCount()
+                    +", SQL Rate:"+ATSApplication.getSqlLite().getLogTableCount()));
             manager.notify(1, mBuilder.build());
         } else {
 
@@ -230,10 +232,10 @@ public class AtsNotification {
             mSmallRemoteViews.setTextViewText(R.id.content_text, ""+smallContent);
             mBigRemoteViews.setImageViewResource(R.id.notification_logo, ATSApplication.large_icon);
             mBigRemoteViews.setTextViewText(R.id.tittle_text, ""+title);
-            mBigRemoteViews.setTextViewText(R.id.location,   "Loc Interval: "+ATSApplication.locationFetchInterval+ ""+location.getLatitude()+","+location.getLongitude());
+            mBigRemoteViews.setTextViewText(R.id.location,   "Loc Interval: "+ATSApplication.locationFetchInterval+ ""+location.getLatitude()+","+location.getLongitude()+", BTR:"+ATSApplication.BatteryLevel);
             mBigRemoteViews.setTextViewText(R.id.accuracy, String.format("%.2f", location.getAccuracy())   +" meter");
             mBigRemoteViews.setTextViewText(R.id.socket_connectivity, "Socket: "+ (socket_Status?"Connected":"Disconnected"));
-            mBigRemoteViews.setTextViewText(R.id.other_info, "Speed:"+location.getSpeed()+",  bearing:"+location.getBearing()+" m/sec"+", Total logs: "+totalCashedData);
+            mBigRemoteViews.setTextViewText(R.id.other_info, "Speed:"+location.getSpeed()+",  bearing:"+location.getBearing()+" m/sec"+", Total logs: "+totalCashedData +" SQL Rate:"+ATSApplication.getSqlLite().getLogTableCount());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
                 mNotificationManager.notify(NOTIF_ID, mNotification);
             }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {

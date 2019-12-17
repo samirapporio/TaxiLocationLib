@@ -28,6 +28,8 @@ public class MainApplication extends ATSApplication {
                 .setNotificationReceivedHandler(new MyNotificationReceiverhandler())
                 .unsubscribeWhenNotificationsAreDisabled(true)
                 .init();
+
+
     }
 
     @Override
@@ -87,11 +89,13 @@ public class MainApplication extends ATSApplication {
         if (playerid.equals("NA")) {
 
         } else {
+
+
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("app_id", "89785e84-3330-4e07-b216-be05b666c212");
 
             JSONObject contentObject = new JSONObject();
-            contentObject.put("en", "Message from arget device");
+            contentObject.put("en", "Message from target device");
             jsonObject.put("contents", contentObject);
 
             JSONObject dataObject = new JSONObject();
@@ -103,18 +107,15 @@ public class MainApplication extends ATSApplication {
             jsonObject.put("include_player_ids", player_ids_array);
 
 
-
-            AndroidNetworking.post("https://app.onesignal.com/api/v1/notifications").addJSONObjectBody(jsonObject).build().getAsString(new StringRequestListener() {
+            OneSignal.postNotification(jsonObject, new OneSignal.PostNotificationResponseHandler() {
                 @Override
-                public void onResponse(String response) {
-                    Log.i(TAG , ""+response);
+                public void onSuccess(JSONObject response) {
                     Toast.makeText(mContext, "Synced :"+action, Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
-                public void onError(ANError anError) {
-                    Toast.makeText(mContext, "Sync Error for:"+action+"  with Error Code:"+anError.getErrorCode(), Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, ""+anError.getErrorDetail());
+                public void onFailure(JSONObject response) {
+                    Toast.makeText(mContext, "Sync Error for:"+action +""+response, Toast.LENGTH_SHORT).show();
                 }
             });
         }

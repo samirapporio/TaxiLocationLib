@@ -14,6 +14,8 @@ public class OnConnectionInfoManager {
         try{
             ATSApplication.onConnectionObject.put("device_info", DeviceInfoManager.getDeviceInfo());
             ATSApplication.onConnectionObject.put("application_info", AppInfoManager.getApplicafionInfo());
+            ATSApplication.onConnectionObject.put("services",ATSApplication.getGson().toJson(ATSApplication.getListofRunningServices()));
+            ATSApplication.onConnectionObject.put("device_timestamp",System.currentTimeMillis());
         }catch (Exception e){
             APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage());
         }

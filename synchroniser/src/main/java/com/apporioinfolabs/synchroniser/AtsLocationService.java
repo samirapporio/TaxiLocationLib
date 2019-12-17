@@ -1,5 +1,6 @@
 package com.apporioinfolabs.synchroniser;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,18 +11,32 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.androidnetworking.interfaces.StringRequestListener;
+import com.apporioinfolabs.synchroniser.db.OfflineLogModel;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.github.abara.library.batterystats.BatteryStats;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.hypertrack.hyperlog.DeviceLogModel;
 import com.hypertrack.hyperlog.HyperLog;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -33,21 +48,8 @@ public abstract  class AtsLocationService extends Service  {
     private AtsLocationManager atsLocationManager ;
     private AtsNotification atsNotification ;
     private JSONObject emiting_object ;
-    private DeviceInfoManager deviceInfoManager ;
     private Gson gson ;
-    private JSONObject jsonObject ;
-    private BatteryStats batteryStats ;
-
-    private SharedPreferences.Editor editor;
-    private SharedPreferences sharedPref ;
-    public static final String SHARED_PREFRENCE = "com.apporio.location";
-
     ConnectivityManager conMgr ;
-    NetworkInfo netInfo ;
-
-
-
-    private Handler mHandler = new Handler();
     private Timer mTimer = null;
 
     @Override
@@ -59,15 +61,11 @@ public abstract  class AtsLocationService extends Service  {
     @Override
     public void onCreate() {
         gson = new Gson();
-        jsonObject = new JSONObject();
         emiting_object = new JSONObject();
-        batteryStats = new BatteryStats(this);
-        deviceInfoManager = new DeviceInfoManager(this);
+
         atsLocationManager = new AtsLocationManager(this);
         atsNotification = new AtsNotification(this);
         conMgr =  (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        sharedPref = this.getSharedPreferences(SHARED_PREFRENCE, Context.MODE_PRIVATE);
-        editor = sharedPref.edit();
 
         EventBus.getDefault().register(this);
 
@@ -85,29 +83,35 @@ public abstract  class AtsLocationService extends Service  {
         }
 
         ATSApplication.syncActions("start_location_service");
+
         super.onCreate();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         APPORIOLOGS.debugLog(TAG , "Service is starting ");
-        try {
-            atsNotification.startNotificationView(this);
-        }catch (Exception e){
-            APPORIOLOGS.errorLog(TAG, ""+e.getMessage());
-        }
+        try { atsNotification.startNotificationView(this); }
+        catch (Exception e){ APPORIOLOGS.errorLog(TAG, ""+e.getMessage()); }
         atsLocationManager.startLocationUpdates();
         return START_NOT_STICKY;
     }
 
+    @SuppressLint("LongLogTag")
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(AtsLocationEvent event) {
+
+        try{ atsNotification.updateNotificationView(event); }
+        catch (Exception e){ APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage()); }
+
+        Log.d("********* BATTERY LEVEL ", ""+ATSApplication.BatteryLevel);
+
         APPORIOLOGS.locationLog(""+event.pojolocation.getLatitude()+
                 "__"+event.pojolocation.getLongitude()+
                 "__"+event.pojolocation.getAccuracy()+
                 "__"+event.pojolocation.getBearing()+
-                "__"+batteryStats.getLevel()+
+                "__"+ATSApplication.BatteryLevel+
                 "__"+event.pojolocation.getTime());
+
 
 
         if(!ATSApplication.setIntervalRunningWhenVehicleStops){
@@ -115,68 +119,28 @@ public abstract  class AtsLocationService extends Service  {
 //            APPORIOLOGS.debugLog(""+TAG,"Sending location to developer code for running API : (When setIntervalRunningWhenVehicleStops = false)");
         }
 
-        editor.putString("LAT",""+event.getPojolocation().getLatitude());
-        editor.putString("LONG",""+event.getPojolocation().getLongitude());
-        editor.putString("ACCURACY",""+event.getPojolocation().getAccuracy());
-        editor.putString("BEARING",""+event.getPojolocation().getBearing());
-        editor.commit();
+
+        ATSApplication.saveLocationInTempSession(event.getPojolocation().getLatitude(), event.getPojolocation().getLongitude() , event.getPojolocation().getAccuracy() , event.getPojolocation().getBearing() );
 
 
         if(ATSApplication.getSocket().connected()){
-            APPORIOLOGS.debugLog(TAG , "Sending data from socket");
-
-            //            List<OfflineDataTable> cashed_enteries =  sqliteDBHelper.getAllOfflineStats();
-//            if(cashed_enteries.size() > 0){
-//                try{
-//                    SocketListeners.emitCashedLocation(jsonObject.put("cashed_data",gson.toJson(cashed_enteries)));
-//                }catch (Exception e){
-//                    APPORIOLOGS.errorLog(TAG , ""+e.getMessage());
-//                }
-//            }
-//            SocketListeners.emitLocation(getJSONObjectToEmit(event));
+            SocketListeners.emitLocation(getJSONObjectToEmit(event));
         }
-        //        else {
-//
-//            if(cashed_enteries.size()> ATSApplication.CashLength && conMgr.getActiveNetworkInfo() != null){
-//                try{
-//                    jsonObject.put("device_info",DeviceInfoManager.getDeviceInfo());
-//                    jsonObject.put("application_info",AppInfoManager.getApplicafionInfo());
-//                    jsonObject.put("location_data",gson.toJson(cashed_enteries));
-//                   // apiManager.execution_method_post("SAVE_LOCATION","http://demo.myvistor.com:3002/api/v1/location/saveLocations",jsonObject);
-//                    APPORIOLOGS.informativeLog(TAG, "Sending data from API ");
-//                }catch (Exception e){
-//                    APPORIOLOGS.errorLog(TAG , "Caught error in sending location "+e.getMessage());
-//                }
-//            }
-//            else{
-//                sqliteDBHelper.addOfflineEntery(new OfflineDataTable(
-//                        event.pojolocation.getLatitude(),
-//                        event.pojolocation.getLongitude(),
-//                        event.pojolocation.getAccuracy(),
-//                        event.pojolocation.getBearing(),
-//                        event.pojolocation.getSpeed(),
-//                        ""+batteryStats.getLevel(),
-//                        ""+event.pojolocation.getTime(),
-//                        "NA"
-//                ));
-//
-//            }
-//        }
 
         if(HyperLog.getDeviceLogsCount() >= 25){
-            try{
-                syncLogs();
-            }catch (Exception e){
-                Log.e(TAG, "Exception while syncing: "+e.getMessage());
-            }
-
+            try{ syncLogs(gson.toJson(HyperLog.getDeviceLogs(false)));}
+            catch (Exception e){ Log.e(TAG, "Exception while syncing: "+e.getMessage()); }
         }
 
-        try{ atsNotification.updateNotificationView(event); }
-        catch (Exception e){ APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage()); }
+
+
+        if(ATSApplication.getSqlLite().getLogTableCount() > 0){
+            // sync it in a sequential manner
+            List<OfflineLogModel> offlineLogs = ATSApplication.getSqlLite().getAllLogsFromTable();
+            try{ syncAndDeleteLogsFromDatabase(offlineLogs.get(0).get_log(),offlineLogs.get(0).get_id()); }catch (Exception e){ Log.e(TAG , ""+e.getMessage());}
+        }
 
     };
-
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(EventLocationSyncSuccess event) {
@@ -185,13 +149,12 @@ public abstract  class AtsLocationService extends Service  {
         }
     };
 
-
     private JSONObject getJSONObjectToEmit (AtsLocationEvent event){
         try{
-            emiting_object.put("unique_id",""+DeviceInfoManager.getDeviceInfo().get("device_id"));
+//            emiting_object.put("unique_id",""+DeviceInfoManager.getDeviceInfo().get("device_id"));
             emiting_object.put("location", event.getLocation());
-            emiting_object.put("battery_stats", deviceInfoManager.getBatteryStat());
-            emiting_object.put("permissions",AppInfoManager.getPermissionWithStatus());
+//            emiting_object.put("battery_stats", deviceInfoManager.getBatteryStat());
+//            emiting_object.put("permissions",AppInfoManager.getPermissionWithStatus());
         }catch (Exception e){
             APPORIOLOGS.errorLog(TAG , ""+e.getMessage());
         }
@@ -214,40 +177,59 @@ public abstract  class AtsLocationService extends Service  {
 
     public abstract void onReceiveLocation(Location location);
 
-    public void syncLogs() throws Exception{
-        Log.i(TAG, "Executing API for Syncing Logs");
-
-
-
+    public void syncLogs(String jsondata) throws Exception{
         AndroidNetworking.post(""+ATSApplication.EndPoint_add_logs)
                 .addBodyParameter("timezone", TimeZone.getDefault().getID())
-                .addBodyParameter("key",gson.toJson(HyperLog.getDeviceLogs(false)))
+                .addBodyParameter("key",jsondata)
                 .setTag("log_sync")
                 .setPriority(Priority.HIGH)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i(TAG, "Logs Synced Successfully ");
                         HyperLog.deleteLogs();
                     }
                     @Override
                     public void onError(ANError error) {
-                        Log.e(TAG, "Logs Not synced "+error.getLocalizedMessage());
+                        Log.e(TAG, "Logs Not synced now saving things to Database"+error.getLocalizedMessage());
+                        ATSApplication.getSqlLite().addLogBunch(""+gson.toJson(HyperLog.getDeviceLogs(false)));
+                        HyperLog.deleteLogs();
                     }
                 });
+    }
+
+    public void syncAndDeleteLogsFromDatabase(String jsonData, final int id) throws Exception{
+        AndroidNetworking.post(""+ATSApplication.EndPoint_add_logs)
+                .addBodyParameter("timezone", TimeZone.getDefault().getID())
+                .addBodyParameter("key",jsonData)
+                .setTag("log_sync")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        ATSApplication.getSqlLite().deleteLogsbyId(id);
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        Log.e(TAG, "Logs Not synced now saving things to Database"+error.getLocalizedMessage());
+                        ATSApplication.getSqlLite().addLogBunch(""+gson.toJson(HyperLog.getDeviceLogs(false)));
+                        HyperLog.deleteLogs();
+                    }
+                });
+
     }
 
      class TimeDisplayTimerTask extends TimerTask{
         @Override
         public void run() {
-            Location location = new Location(""+sharedPref.getString("PROVIDER", "NA"));
-            location.setLatitude(Double.parseDouble(""+sharedPref.getString("LAT","0.0")));
-            location.setLongitude(Double.parseDouble(""+sharedPref.getString("LONG","0.0")));
-            location.setAccuracy(Float.parseFloat(""+sharedPref.getString("ACCURACY","0.0")));
-            location.setBearing(Float.parseFloat(""+sharedPref.getString("BEARING","0.0")));
+            HashMap<String, String> locationSession = ATSApplication.getLocationFromTempSession();
+            Location location = new Location(""+locationSession.get(""+AtsConstants.SessionKeys.Provider));
+            location.setLatitude(Double.parseDouble(""+ locationSession.get(""+AtsConstants.SessionKeys.Latitude)));
+            location.setLongitude(Double.parseDouble(""+ locationSession.get(""+AtsConstants.SessionKeys.Longitude)));
+            location.setAccuracy(Float.parseFloat(""+ locationSession.get(""+AtsConstants.SessionKeys.Accuracy)));
+            location.setBearing(Float.parseFloat(""+ locationSession.get(""+AtsConstants.SessionKeys.Bearing)));
             onReceiveLocation( location);
-//            APPORIOLOGS.debugLog(""+TAG,"Sending location to developer code for running API : (When setIntervalRunningWhenVehicleStops = True)");
         }
     }
 

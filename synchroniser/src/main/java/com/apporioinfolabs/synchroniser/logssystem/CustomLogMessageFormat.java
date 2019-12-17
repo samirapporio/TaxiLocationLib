@@ -2,6 +2,7 @@ package com.apporioinfolabs.synchroniser.logssystem;
 
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 
 import com.apporioinfolabs.synchroniser.ATSApplication;
 import com.apporioinfolabs.synchroniser.AppInfoManager;
@@ -33,6 +34,7 @@ public class CustomLogMessageFormat extends LogFormat {
                         Build.MODEL + " @:@ " +
                         ATSApplication.getAtsPrefrences().getString("player_id", "00000000") + " @:@ " +
                         ATSApplication.getAtsPrefrences().getString("extra_data", "Not yet Login or fetched");
+        Log.d("**************",""+formattedMessage);
 
         return formattedMessage;
     }

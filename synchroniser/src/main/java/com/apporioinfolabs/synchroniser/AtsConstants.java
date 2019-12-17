@@ -10,4 +10,12 @@ public interface AtsConstants {
     String CLEAR_ONE_SIGNAL_NOTIFICATIONS = "clear_OneSignal_Notifications";
     String SYNC_APP_STATE_ERROR = "sync_app_state_error";
 
+    interface SessionKeys{
+        String Latitude = "LAT";
+        String Longitude = "LONG";
+        String Provider = "PROVIDER";
+        String Accuracy = "ACCURACY";
+        String Bearing = "BEARING";
+    }
+
 }

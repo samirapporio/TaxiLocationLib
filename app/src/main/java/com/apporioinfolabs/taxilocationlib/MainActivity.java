@@ -1,57 +1,89 @@
 package com.apporioinfolabs.taxilocationlib;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.StringRequestListener;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.apporioinfolabs.synchroniser.ATSApplication;
-import com.apporioinfolabs.synchroniser.AtsLocationService;
+import com.apporioinfolabs.synchroniser.AtsEventBus;
+import com.apporioinfolabs.synchroniser.AtsSocket;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
-import com.onesignal.OSSubscriptionObserver;
-import com.onesignal.OSSubscriptionStateChanges;
-import com.onesignal.OneSignal;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-import org.json.JSONObject;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
-public class MainActivity extends Activity implements OSSubscriptionObserver {
+public class MainActivity extends FragmentActivity implements  OnMapReadyCallback {
+
+
+    EditText editText , log_val, edt_listen_box ;
+    TextView fetched_text , unique_no_text, device_fetch_text;
+    ImageView  socket_connection_state , device_image ;
+    ProgressBar device_progress_fetch ;
+
+    private final String TAG = "MainActivity";
+
+    private AtsSocket atsSocket ;
+    private GoogleMap mMap = null;
+    private Gson gson ;
+    RequestQueue queue ;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        OneSignal.addSubscriptionObserver(this);
-        ATSApplication.setPlayerId(""+OneSignal.getPermissionSubscriptionState().getSubscriptionStatus().getUserId());
-        ATSApplication.setExtraData("{driver_id:1043,driver_name:Samir goel,driver_email:samir@apporio.com,driver_vehicle_no:DL-3656}");
+        gson = new GsonBuilder().create();
+        editText = findViewById(R.id.edittext);
+        edt_listen_box = findViewById(R.id.edt_listen_box);
+        unique_no_text = findViewById(R.id.unique_no_text);
+        fetched_text = findViewById(R.id.fetched_text);
+        device_fetch_text = findViewById(R.id.device_fetch_text);
+        device_image = findViewById(R.id.device_image);
+        device_progress_fetch = findViewById(R.id.device_progress_fetch);
+        log_val = findViewById(R.id.log_val);
+
+        socket_connection_state = findViewById(R.id.socket_connection_state);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+        mapFragment.getMapAsync(this);
+        queue = Volley.newRequestQueue(this);
+
+        atsSocket = new AtsSocket();
 
 
 
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
-        APPORIOLOGS.debugLog("MainActivity","Some Log");
+        unique_no_text.setText("Device UUID: "+Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+
+
+
+
 
         findViewById(R.id.add_log).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                APPORIOLOGS.debugLog("MainActivity","Some Log");
+                APPORIOLOGS.verboseLog("MainActivity","Some Log");
             }
         });
 
@@ -73,26 +105,175 @@ public class MainActivity extends Activity implements OSSubscriptionObserver {
             }
         });
 
+
+
+        findViewById(R.id.extra_data).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+             if(editText.getText().toString().equals("")){
+                 Toast.makeText(MainActivity.this, "Please Add some data to identify your device", Toast.LENGTH_SHORT).show();
+             }   else{
+                 ATSApplication.setExtraData(""+editText.getText().toString());
+             }
+            }
+        });
+
+
+
+
+        findViewById(R.id.ok_listen_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listenToTheEnteredKey();
+            }
+        });
+
+
+        findViewById(R.id.stop_listen_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(edt_listen_box.getText().toString().equals("")){
+                    Toast.makeText(MainActivity.this, "Key is not yet added", Toast.LENGTH_SHORT).show();
+                }else{
+                   atsSocket.stopAllListenersListen(""+edt_listen_box.getText().toString());
+                }
+            }
+        });
+
+
+        findViewById(R.id.remove_current_listener).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(edt_listen_box.getText().toString().equals("")){
+                    Toast.makeText(MainActivity.this, "Enter some key that you want to remove for listen. ", Toast.LENGTH_SHORT).show();
+                }else{
+                    atsSocket.stopListen("" + edt_listen_box.getText().toString(), new AtsSocket.OnAtsSocketListener() {
+                        @Override
+                        public void onMessageReceived(String message) {
+                            Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onSuccessRegistrataion(String message) {
+                            Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
+                            edt_listen_box.setText("");
+                        }
+
+                        @Override
+                        public void onFailureRegistration(String message) {
+                            Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
+
+        findViewById(R.id.connected_devices_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivityForResult(new Intent(MainActivity.this, DeviceListActivity.class), 111);
+
+
+
+            }
+        });
+
+
     }
 
     @Override
-    public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
-        Toast.makeText(this, ""+stateChanges.toString(), Toast.LENGTH_SHORT).show();
+    protected void onResume() {
+        super.onResume();
+        AtsEventBus.getDefault().register(this);
+        setConnectivityStatusView();
+        listenToTheEnteredKey();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AtsEventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAtsMessage(String atsEvent) {
+        changeSocketConnectionColor(atsEvent);
+    };
+
+
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
     }
 
 
+    public void setMarkerandMapCamera(double latitude, double longitude){
+        if(mMap != null){
+            mMap.clear();
+            LatLng coordinate = new LatLng(latitude, longitude);
+            mMap.addMarker(new MarkerOptions().position(coordinate).title(""+latitude+", "+longitude));
+            mMap.animateCamera( CameraUpdateFactory.newLatLngZoom(coordinate, 15));
+
+        }
+
+    }
 
 
+    private void listenToTheEnteredKey(){
+        if(edt_listen_box.getText().toString().equals("")){
+//            Toast.makeText(MainActivity.this, "Please add key first", Toast.LENGTH_SHORT).show();
+        }else{
+            atsSocket.startListen(""+edt_listen_box.getText().toString(), new AtsSocket.OnAtsSocketListener() {
+                @Override
+                public void onMessageReceived(String message) {
+                    Log.d("*******",""+message);
+                    fetched_text.setText(""+message);
+                    try{
+                        ModelLocationIncoming modelLocationIncoming = gson.fromJson(""+message,ModelLocationIncoming.class);
+                        fetched_text.setText(""+modelLocationIncoming.getLocation().getLatitude()+", "+modelLocationIncoming.getLocation().getLongitude());
+                        setMarkerandMapCamera(modelLocationIncoming.getLocation().getLatitude(), modelLocationIncoming.getLocation().getLongitude());
+                    }catch (Exception e){
+                        fetched_text.setText(""+message);
+                    }
+                }
+
+                @Override
+                public void onSuccessRegistrataion(String message) {
+                    Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailureRegistration(String message) {
+                    Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private void setConnectivityStatusView(){
+        if(ATSApplication.IS_SOCKET_CONNECTED){socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_connected_vector));}
+        else{ socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_disconnected_vector));}
+
+    }
+
+    private void changeSocketConnectionColor(String val){
+        if(val.equals(""+AtsEventBus.SOCKET_CONNECTED)){
+            socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_connected_vector));
+        }else if(val.equals(""+AtsEventBus.SOCKET_DISCONNECTED)){
+            socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_disconnected_vector));
+        }
+    }
 
 
-    private  boolean isServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if(requestCode == 111){
+            if(data != null){
+                Toast.makeText(this, ""+data.getExtras().getString("MESSAGE"), Toast.LENGTH_SHORT).show();
             }
         }
-        return false;
+        super.onActivityResult(requestCode, resultCode, data);
     }
-
 }

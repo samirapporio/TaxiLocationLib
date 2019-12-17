@@ -16,12 +16,12 @@ import java.util.TimeZone;
 public class ApiSynchroniesr {
 
     private OnSync onSync ;
+
     private final static String TAG = ""+ApiSynchroniesr.class.getSimpleName();
 
     public ApiSynchroniesr(OnSync onSync){
         this.onSync = onSync ;
     }
-
 
     public void syncLogsAccordingly( ){
         Log.d(TAG, "Syncing Logs to Log panel");
@@ -92,8 +92,6 @@ public class ApiSynchroniesr {
                 });
 
     }
-
-
 
     public interface OnSync{
         void onSyncSuccess(String action);
