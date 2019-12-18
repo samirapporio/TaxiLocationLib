@@ -34,9 +34,20 @@ public class ApiSynchroniesr {
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i(TAG, "Logs Synced Successfully ");
-                        HyperLog.deleteLogs();
-                        onSync.onSyncSuccess(""+AtsConstants.SYNC_ESISTING_LOGS);
+                        try{
+                            ModelResultChecker modelResultChecker = ATSApplication.getGson().fromJson(""+response,ModelResultChecker.class);
+                            if(modelResultChecker.getResult() == 1 ){
+                                Log.i(TAG, "Logs Synced Successfully ");
+                                HyperLog.deleteLogs();
+                                onSync.onSyncSuccess(""+AtsConstants.SYNC_ESISTING_LOGS);
+                            }else{
+                                Log.e(TAG, "Logs Not synced from server got message "+modelResultChecker.getMessage());
+                                onSync.onSyncError(""+AtsConstants.SYNC_ESISTING_LOGS_ERROR);
+                            }
+                        }catch (Exception e){
+                            Log.e(TAG, "Logs Not synced with error code: "+e.getMessage());
+                            onSync.onSyncError(""+AtsConstants.SYNC_ESISTING_LOGS_ERROR);
+                        }
                     }
                     @Override
                     public void onError(ANError error) {
