@@ -43,7 +43,6 @@ public class DeviceListActivity extends Activity implements HolderDevices.OnClic
     }
 
 
-
     private void setitemsInPlaceHolder(List<ModelConnectedSockets.ConnectedSocketsBean> connected_sockets){
         for(int i =0 ; i < connected_sockets.size() ; i++){
             placeholder.addView(new HolderDevices(this, this, connected_sockets.get(i)));

@@ -124,7 +124,8 @@ public abstract  class AtsLocationService extends Service  {
         if(ATSApplication.getSqlLite().getLogTableCount() > 0){
             // sync it in a sequential manner
             List<OfflineLogModel> offlineLogs = ATSApplication.getSqlLite().getAllLogsFromTable();
-            try{ syncAndDeleteLogsFromDatabase(offlineLogs.get(0).get_log(),offlineLogs.get(0).get_id()); }catch (Exception e){ Log.e(TAG , ""+e.getMessage());}
+            try{ syncAndDeleteLogsFromDatabase(offlineLogs.get(0).get_log(),offlineLogs.get(0).get_id()); }
+            catch (Exception e){ Log.e(TAG , ""+e.getMessage());}
         }
 
     };
@@ -199,9 +200,7 @@ public abstract  class AtsLocationService extends Service  {
                     }
                     @Override
                     public void onError(ANError error) {
-                        Log.e(TAG, "Logs Not synced now saving things to Database"+error.getLocalizedMessage());
-                        ATSApplication.getSqlLite().addLogBunch(""+gson.toJson(HyperLog.getDeviceLogs(false)));
-                        HyperLog.deleteLogs();
+                        Log.e(TAG, "Logs Not synced via call database");
                     }
                 });
 

@@ -328,6 +328,8 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
         if(requestCode == 111){
             if(data != null){
                 Toast.makeText(this, ""+data.getExtras().getString("MESSAGE"), Toast.LENGTH_SHORT).show();
+                edt_listen_box.setText(""+data.getExtras().getString("MESSAGE"));
+                listenToTheEnteredKey();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
