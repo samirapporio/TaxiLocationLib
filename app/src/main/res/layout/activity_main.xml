@@ -115,35 +115,81 @@
             </LinearLayout>
 
 
+
+
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp">
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:gravity="center">
 
-
-                <EditText
+                <LinearLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
-                    android:background="#E4E4E4"
                     android:layout_weight="1"
-                    android:id="@+id/log_val"
-                    android:hint="Sample log value for test "
-                    android:paddingLeft="5dp"
-                    android:textSize="13dp"
-                    android:layout_margin="20dp"/>
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content">
 
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:id="@+id/select_log_type_layout">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="12dp"
+                            android:id="@+id/log_level_text"
+                            android:textColor="#333333"
+                            android:text="Debug bug"/>
+                        <ImageView
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_marginLeft="10dp"
+                            android:tint="#333333"
+                            android:src="@drawable/ic_sort_down_vector"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="11dp"
+                            android:layout_marginLeft="10dp"
+                            android:textColor="#8B2F54"
+                            android:text="( Tag = MainActivity )"/>
+
+
+                    </LinearLayout>
+
+
+                    <EditText
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Your log value"
+                        android:id="@+id/log_input_edt"
+                        android:textSize="13dp"/>
+
+
+
+                </LinearLayout>
 
 
                 <Button
-                    android:layout_width="150dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Add Log"
-                    android:id="@+id/add_log"/>
+                    android:id="@+id/add_log_btn"/>
             </LinearLayout>
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trial"
+                android:id="@+id/trialll"/>
+
 
             <Button
                 android:layout_width="fill_parent"

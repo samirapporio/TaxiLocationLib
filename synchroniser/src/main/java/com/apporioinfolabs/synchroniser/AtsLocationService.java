@@ -4,37 +4,24 @@ import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.androidnetworking.interfaces.StringRequestListener;
 import com.apporioinfolabs.synchroniser.db.OfflineLogModel;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
-import com.github.abara.library.batterystats.BatteryStats;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.hypertrack.hyperlog.DeviceLogModel;
 import com.hypertrack.hyperlog.HyperLog;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -101,7 +88,7 @@ public abstract  class AtsLocationService extends Service  {
     public void onMessageEvent(AtsLocationEvent event) {
 
         try{ atsNotification.updateNotificationView(event); }
-        catch (Exception e){ APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage()); }
+        catch (Exception e){ APPORIOLOGS.warningLog(TAG , ""+e.getMessage()); }
 
         Log.d("********* BATTERY LEVEL ", ""+ATSApplication.BatteryLevel);
 

@@ -1,5 +1,6 @@
 package com.apporioinfolabs.taxilocationlib;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -8,11 +9,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.android.volley.RequestQueue;
@@ -36,10 +39,13 @@ import org.greenrobot.eventbus.ThreadMode;
 public class MainActivity extends FragmentActivity implements  OnMapReadyCallback {
 
 
-    EditText editText , log_val, edt_listen_box ;
-    TextView fetched_text , unique_no_text, device_fetch_text;
+    EditText editText , edt_listen_box , log_input_edt;
+    TextView fetched_text , unique_no_text, device_fetch_text, log_level_text ;
     ImageView  socket_connection_state , device_image ;
     ProgressBar device_progress_fetch ;
+    LinearLayout select_log_type_layout ;
+    private final String [] log_levels = {"Debug","Warning","Error","Verbose","Information"};
+    private int selectedlogLevel = 0;
 
     private final String TAG = "MainActivity";
 
@@ -49,20 +55,22 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
     RequestQueue queue ;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         gson = new GsonBuilder().create();
         editText = findViewById(R.id.edittext);
+        log_input_edt = findViewById(R.id.log_input_edt);
         edt_listen_box = findViewById(R.id.edt_listen_box);
         unique_no_text = findViewById(R.id.unique_no_text);
         fetched_text = findViewById(R.id.fetched_text);
+        select_log_type_layout = findViewById(R.id.select_log_type_layout);
+        log_level_text = findViewById(R.id.log_level_text);
         device_fetch_text = findViewById(R.id.device_fetch_text);
         device_image = findViewById(R.id.device_image);
         device_progress_fetch = findViewById(R.id.device_progress_fetch);
-        log_val = findViewById(R.id.log_val);
+
 
         socket_connection_state = findViewById(R.id.socket_connection_state);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -71,27 +79,26 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
         queue = Volley.newRequestQueue(this);
 
         atsSocket = new AtsSocket();
+        setLogLevelTextAccordingToLevel();
 
 
 
         unique_no_text.setText("Device UUID: "+Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
 
 
-
-
-
-        findViewById(R.id.add_log).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                APPORIOLOGS.verboseLog("MainActivity","Some Log");
-            }
-        });
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(new Intent(this, UpdateServiceClass.class));
         } else { // normal
             startService(new Intent(this, UpdateServiceClass.class));
         }
+
+
+        select_log_type_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showAlertForSelection();
+            }
+        });
 
 
         findViewById(R.id.phone_state).setOnClickListener(new View.OnClickListener() {
@@ -171,10 +178,44 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
         findViewById(R.id.connected_devices_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 startActivityForResult(new Intent(MainActivity.this, DeviceListActivity.class), 111);
+            }
+        });
+
+        findViewById(R.id.add_log_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(log_input_edt.getText().toString().equals("")){
+                    Toast.makeText(MainActivity.this, "Please input Some Value as log", Toast.LENGTH_SHORT).show();
+                }else{
+                    switch (""+log_levels[selectedlogLevel]){
+                        case "Debug":
+                            APPORIOLOGS.debugLog(TAG,log_input_edt.getText().toString());
+                            break;
+                        case "Warning":
+                            APPORIOLOGS.warningLog(TAG,log_input_edt.getText().toString());
+                            break;
+                        case "Error":
+                            APPORIOLOGS.errorLog(TAG,log_input_edt.getText().toString());
+                            break;
+                        case "Verbose":
+                            APPORIOLOGS.verboseLog(TAG,log_input_edt.getText().toString());
+                            break;
+                        case "Information":
+                            APPORIOLOGS.informativeLog(TAG,log_input_edt.getText().toString());
+                            break;
+
+                    }
+                    log_input_edt.setText("");
+                }
+            }
+        });
 
 
+
+        findViewById(R.id.trialll).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
             }
         });
@@ -202,10 +243,25 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
     };
 
 
+    private void showAlertForSelection (){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Select log Level")
+                .setItems(log_levels, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        selectedlogLevel = which ;
+                        setLogLevelTextAccordingToLevel();
+                    }
+                }).create().show();
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+    }
+
+    private void setLogLevelTextAccordingToLevel(){
+        log_level_text.setText(""+log_levels[selectedlogLevel]);
     }
 
 

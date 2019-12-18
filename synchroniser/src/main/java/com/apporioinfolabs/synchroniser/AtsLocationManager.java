@@ -58,7 +58,7 @@ public class AtsLocationManager {
                         atsLocationEvent.setLocation(getLocationObject(location, locationJsonObject));
                         EventBus.getDefault().post(atsLocationEvent);
                     }catch (Exception e){
-                        APPORIOLOGS.exceptionLog(TAG, ""+e.getMessage());
+                        APPORIOLOGS.warningLog(TAG, ""+e.getMessage());
                     }
                 }
             }
@@ -117,7 +117,7 @@ public class AtsLocationManager {
         try{
             fusedLocationClient.removeLocationUpdates(locationCallback);
         }catch (Exception e){
-           APPORIOLOGS.exceptionLog(TAG , ""+e.getMessage());
+           APPORIOLOGS.warningLog(TAG , ""+e.getMessage());
         }
 
     }

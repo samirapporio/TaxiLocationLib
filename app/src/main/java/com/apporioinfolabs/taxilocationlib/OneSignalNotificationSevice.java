@@ -11,6 +11,8 @@ import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationReceivedResult;
 import com.onesignal.OneSignal;
 
+import org.json.JSONObject;
+
 public class OneSignalNotificationSevice extends NotificationExtenderService {
 
     private final static String TAG = "OneSignalNotificationSevice";
@@ -25,18 +27,14 @@ public class OneSignalNotificationSevice extends NotificationExtenderService {
             Log.d(TAG , "---------> "+receivedResult.payload.additionalData);
 
             try {
-                action = ""+receivedResult.payload.additionalData.getString("action" );
-                doActioAccordingToState (""+receivedResult.payload.additionalData.getString("action"));
-                MainApplication.targetPlayerIdNotification = ""+receivedResult.payload.additionalData.getString("player_id");
+                String data  = ""+receivedResult.payload.additionalData.getString("data" );
+                JSONObject jsonObject = new JSONObject(data);
+                doActioAccordingToState (""+jsonObject.getString("action"));
+                MainApplication.targetPlayerIdNotification = ""+jsonObject.getString("player_id");
             } catch (Exception e) {
                 Log.e(TAG , ""+e.getMessage());
             }
         }
-//        if(action.equals(AtsConstants.CLEAR_ONE_SIGNAL_NOTIFICATIONS)){
-//            return true ;
-//        }else{
-//            return false;
-//        }
         return false ;
     }
 

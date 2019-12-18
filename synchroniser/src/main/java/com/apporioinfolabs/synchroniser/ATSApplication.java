@@ -16,12 +16,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
-import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.common.Priority;
-import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.apporioinfolabs.synchroniser.db.SqliteDBHelper;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.apporioinfolabs.synchroniser.logssystem.CustomLogMessageFormat;
@@ -29,7 +23,6 @@ import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.hypertrack.hyperlog.DeviceLogModel;
 import com.hypertrack.hyperlog.HyperLog;
 
 import org.json.JSONObject;
@@ -37,7 +30,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
 
 public abstract class ATSApplication extends Application  implements Application.ActivityLifecycleCallbacks, ApiSynchroniesr.OnSync  {
 
@@ -92,7 +84,7 @@ public abstract class ATSApplication extends Application  implements Application
         small_Icon = R.drawable.apporio_logo ;
         mContext = this;
         HyperLog.initialize(this);
-        HyperLog.setLogLevel(Log.VERBOSE);
+        HyperLog.setLogLevel(Log.DEBUG);
         HyperLog.setLogFormat(new CustomLogMessageFormat(this));
         sharedPref = this.getSharedPreferences(SHARED_PREFRENCE, Context.MODE_PRIVATE);
         sqliteDBHelper = new SqliteDBHelper(this);
@@ -265,7 +257,7 @@ public abstract class ATSApplication extends Application  implements Application
 //            Toast.makeText(activity, "Enters in background | Pending logs"+HyperLog.hasPendingDeviceLogs()+" | Log count:"+HyperLog.getDeviceLogsCount(), Toast.LENGTH_LONG).show();
             app_foreground = false ;
             try{syncLogsAccordingly();}catch (Exception e){
-                APPORIOLOGS.exceptionLog(TAG, ""+e.getMessage());
+                APPORIOLOGS.warningLog(TAG, ""+e.getMessage());
             }
             removePreviousListeners();
         }

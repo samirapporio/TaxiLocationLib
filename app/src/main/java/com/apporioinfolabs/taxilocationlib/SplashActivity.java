@@ -4,14 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.ImageView;
 import android.widget.TextView;
-
+import com.apporioinfolabs.synchroniser.ATSApplication;
 import com.onesignal.OSSubscriptionObserver;
 import com.onesignal.OSSubscriptionStateChanges;
 import com.onesignal.OneSignal;
-
-import org.json.JSONObject;
 
 public class SplashActivity extends Activity implements OSSubscriptionObserver {
 
@@ -27,7 +24,9 @@ public class SplashActivity extends Activity implements OSSubscriptionObserver {
 
     private void getOneSignalPlayeridAndStartActiviy(){
         if(OneSignal.getPermissionSubscriptionState().getSubscriptionStatus().getSubscribed()){
-            loading_text.setText(""+OneSignal.getPermissionSubscriptionState().getSubscriptionStatus().getUserId());
+            String player_id = OneSignal.getPermissionSubscriptionState().getSubscriptionStatus().getUserId()  ;
+            loading_text.setText(""+player_id);
+            ATSApplication.setPlayerId(player_id);
             goTomainActivity();
         }else{
             OneSignal.addSubscriptionObserver(this);
@@ -50,6 +49,7 @@ public class SplashActivity extends Activity implements OSSubscriptionObserver {
         if (!stateChanges.getFrom().getSubscribed() && stateChanges.getTo().getSubscribed()) {
             String player_id = stateChanges.getTo().getUserId();
             loading_text.setText("Player ID: "+player_id);
+            ATSApplication.setPlayerId(player_id);
             goTomainActivity();
         }else{
             loading_text.setText("Device Not subscribed to OneSignal so retrying now . . .");

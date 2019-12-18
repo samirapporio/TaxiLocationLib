@@ -23,7 +23,7 @@ public class APPORIOLOGS {
     }
 
 
-    public static void exceptionLog (String tag , String message){
+    public static void warningLog(String tag , String message){
         HyperLog.w(tag , message);
     }
 

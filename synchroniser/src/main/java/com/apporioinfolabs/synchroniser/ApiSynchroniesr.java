@@ -17,7 +17,7 @@ public class ApiSynchroniesr {
 
     private OnSync onSync ;
 
-    private final static String TAG = ""+ApiSynchroniesr.class.getSimpleName();
+    private final static String TAG = "ApiSynchroniesr";
 
     public ApiSynchroniesr(OnSync onSync){
         this.onSync = onSync ;
