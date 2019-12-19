@@ -134,6 +134,7 @@ public abstract  class AtsLocationService extends Service  {
 
     };
 
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(EventLocationSyncSuccess event) {
         if(event.isSync()){

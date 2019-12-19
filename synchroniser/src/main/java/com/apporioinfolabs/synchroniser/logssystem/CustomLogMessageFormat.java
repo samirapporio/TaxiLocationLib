@@ -17,6 +17,20 @@ public class CustomLogMessageFormat extends LogFormat {
     }
 
 
+    /*
+    0 --> timestamp of mobile
+    1 --> log type
+    2 --> tag
+    3 --> Unique device no
+    4 --> message
+    5 --> package name
+    6 --> operating system version
+    7 --> application name
+    8 --> app logo
+    9 --> Manufacture
+    10 -> Phone Model
+     */
+
     @Override
     public String getFormattedLogMessage(String logLevelName, String tag, String message, String timeStamp, String senderName, String osVersion, String deviceUUID) {
         String formattedMessage =
@@ -28,12 +42,12 @@ public class CustomLogMessageFormat extends LogFormat {
                         AppInfoManager.getPackageName() + " @:@ " +
                         osVersion + " @:@ " +
                         AppInfoManager.getAppName() + " @:@ " +
-                        DeviceInfoManager.getDeviceInfo() + " @:@ " +
                         "AppLogo" + " @:@ " +
                         Build.MANUFACTURER + " @:@ " +
-                        Build.MODEL + " @:@ " +
-                        AtsApplication.getAtsPrefrences().getString("player_id", "00000000") + " @:@ " +
-                        AtsApplication.getAtsPrefrences().getString("extra_data", "Not yet Login or fetched");
+                        Build.MODEL ;
+
+
+        Log.d("********--> ",""+formattedMessage);
 
         return formattedMessage;
     }

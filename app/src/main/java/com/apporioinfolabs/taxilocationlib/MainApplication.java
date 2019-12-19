@@ -24,8 +24,6 @@ public class MainApplication extends AtsApplication {
                 .setNotificationReceivedHandler(new MyNotificationReceiverhandler())
                 .unsubscribeWhenNotificationsAreDisabled(true)
                 .init();
-
-
     }
 
     @Override
@@ -40,20 +38,20 @@ public class MainApplication extends AtsApplication {
 
     @Override
     public boolean setLogSyncOnAppMinimize() {
-        return false;
+        return true;
     }
 
     @Override
-    public boolean setSocketConnection() { return false; }
+    public boolean setSocketConnection() { return true; }
 
     @Override
     public int setSmallNotificationIcons() {
-        return R.drawable.accuracy_icon;
+        return R.drawable.notification_icon;
     }
 
     @Override
     public int setLargeNotificationIcons() {
-        return R.drawable.accuracy_icon;
+        return R.drawable.notification_icon;
     }
 
     @Override
