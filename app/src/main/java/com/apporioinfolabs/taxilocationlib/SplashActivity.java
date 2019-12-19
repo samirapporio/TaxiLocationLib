@@ -1,16 +1,15 @@
 package com.apporioinfolabs.taxilocationlib;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
-import com.apporioinfolabs.synchroniser.ATSApplication;
+import com.apporioinfolabs.synchroniser.AtsApplication;
 import com.onesignal.OSSubscriptionObserver;
 import com.onesignal.OSSubscriptionStateChanges;
 import com.onesignal.OneSignal;
 
-public class SplashActivity extends Activity implements OSSubscriptionObserver {
+public class SplashActivity extends BaseActivity implements OSSubscriptionObserver {
 
     TextView loading_text ;
 
@@ -26,7 +25,7 @@ public class SplashActivity extends Activity implements OSSubscriptionObserver {
         if(OneSignal.getPermissionSubscriptionState().getSubscriptionStatus().getSubscribed()){
             String player_id = OneSignal.getPermissionSubscriptionState().getSubscriptionStatus().getUserId()  ;
             loading_text.setText(""+player_id);
-            ATSApplication.setPlayerId(player_id);
+            AtsApplication.setPlayerId(player_id);
             goTomainActivity();
         }else{
             OneSignal.addSubscriptionObserver(this);
@@ -49,7 +48,7 @@ public class SplashActivity extends Activity implements OSSubscriptionObserver {
         if (!stateChanges.getFrom().getSubscribed() && stateChanges.getTo().getSubscribed()) {
             String player_id = stateChanges.getTo().getUserId();
             loading_text.setText("Player ID: "+player_id);
-            ATSApplication.setPlayerId(player_id);
+            AtsApplication.setPlayerId(player_id);
             goTomainActivity();
         }else{
             loading_text.setText("Device Not subscribed to OneSignal so retrying now . . .");

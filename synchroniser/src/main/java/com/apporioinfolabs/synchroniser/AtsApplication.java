@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class ATSApplication extends Application  implements Application.ActivityLifecycleCallbacks, ApiSynchroniesr.OnSync  {
+public abstract class AtsApplication extends Application  implements Application.ActivityLifecycleCallbacks, AtsApiSynchroniesr.OnSync  {
 
     private static Socket mSocket;
-    private static final String TAG = "ATSApplication";
+    private static final String TAG = "AtsApplication";
     public static Context mContext  = null;
     private static SharedPreferences.Editor editor;
     private static SharedPreferences sharedPref ;
@@ -48,6 +48,9 @@ public abstract class ATSApplication extends Application  implements Application
     public static String notificatioMakingOnlineText = "Making you online . . . ";
     public static int CashLength = 25 ;
     public static boolean setIntervalRunningWhenVehicleStops = true ;
+    public static boolean autoLogSynchronization = false ;
+    public static boolean logSyncOnAppMinimize = true ;
+    public static boolean isSocketConnection_allowed = true ;
     public static JSONObject onConnectionObject ;
     public static String UNIQUE_NO  = "";
     public static boolean IS_SOCKET_CONNECTED = false ;
@@ -56,7 +59,7 @@ public abstract class ATSApplication extends Application  implements Application
     private boolean isActivityChangingConfigurations = false;
     private static Gson gson ;
     private static boolean app_foreground = false ;
-    private static ApiSynchroniesr apiSynchroniesr ;
+    private static AtsApiSynchroniesr atsApiSynchroniesr = null;
     private static SqliteDBHelper sqliteDBHelper = null ;
 
 
@@ -91,11 +94,9 @@ public abstract class ATSApplication extends Application  implements Application
         editor = sharedPref.edit();
         onConnectionObject = new JSONObject();
         UNIQUE_NO = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        try{ connectToSocketServer(); }
-        catch (Exception e){ Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show(); }
         selDevelopmentModeAccordingly(setDeveloperMode());
         gson = new GsonBuilder().create();
-        apiSynchroniesr = new ApiSynchroniesr(this);
+        atsApiSynchroniesr = new AtsApiSynchroniesr(this);
         small_Icon = setSmallNotificationIcons();
         large_icon = setLargeNotificationIcons() ;
         long minterval = setLocationFetchInterval();
@@ -105,11 +106,28 @@ public abstract class ATSApplication extends Application  implements Application
         notificatioMakingOnlineText = setNotificationMakingOnlineText();
         notificationClickIntent = setNotificationClickIntent() ;
         setIntervalRunningWhenVehicleStops = setIntervalRunningOnVehicleStop();
+        autoLogSynchronization = setAutoLogSynchronization();
+        logSyncOnAppMinimize = setLogSyncOnAppMinimize();
+        isSocketConnection_allowed = setSocketConnection();
+
+        if(isSocketConnection_allowed){
+            try{ connectToSocketServer(); }
+            catch (Exception e){ Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show(); }
+        }else{
+            Log.e(TAG , "Socket Connection Strict to connect by developer");
+        }
+
+
+
         super.onCreate();
         this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         registerActivityLifecycleCallbacks(this);
     }
 
+
+    public static Socket getSocket (){
+        return mSocket ;
+    }
 
     public static Gson getGson(){
         if(gson == null){
@@ -131,6 +149,7 @@ public abstract class ATSApplication extends Application  implements Application
     }
 
 
+
     private void selDevelopmentModeAccordingly(boolean setDeveloperMode) {
 
 //        if(setDeveloperMode){ APPORIOLOGS.informativeLog(TAG , "Application is in development mode"); }
@@ -149,14 +168,14 @@ public abstract class ATSApplication extends Application  implements Application
     public abstract String setNotificationMakingOnlineText() ;
     public abstract PendingIntent setNotificationClickIntent() ;
     public abstract boolean setIntervalRunningOnVehicleStop() ;
-    public static boolean isSocketConnected(){
-        return mSocket.connected();
-    }
+    public abstract String dataSynced(String action);
+    public abstract String dataSyncedError(String error);
+    public abstract boolean setAutoLogSynchronization ();
+    public abstract boolean setLogSyncOnAppMinimize ();
+    public abstract boolean setSocketConnection();
 
 
-    public static Socket getSocket (){
-        return mSocket ;
-    }
+
 
     public void connectToSocketServer() throws Exception{
         mSocket = IO.socket(""+EndPoint_socket);
@@ -171,10 +190,11 @@ public abstract class ATSApplication extends Application  implements Application
     }
 
     public static void removePreviousListeners(){
-        mSocket.off();
-        reConnectToBasicRequiredListeners();
+        if(isSocketConnection_allowed){
+            mSocket.off();
+            reConnectToBasicRequiredListeners();
+        }
     }
-
 
     public static void setPlayerId(String data){
         APPORIOLOGS.playerId(data);
@@ -212,9 +232,47 @@ public abstract class ATSApplication extends Application  implements Application
         return temp_location ;
     }
 
-    public  abstract String dataSynced(String s);
+    public  static void syncLogsAccordingly() throws Exception{
+        Log.d(TAG, "Syncing Logs to Log panel");
+        atsApiSynchroniesr.syncLogsAccordingly();
+    }
 
-    public abstract String dataSyncedError(String s);
+    private static boolean isServiceRunning() {
+
+        ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
+
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (service.service.getClassName().equals("com.apporioinfolabs.taxilocationlib.UpdateServiceClass")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isSocketConnected(){
+        if(isSocketConnection_allowed){
+            if(mSocket.connected()){
+                return true ;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+
+    public static List<String> getListofRunningServices(){
+        List<String> services = new ArrayList<>();
+        ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
+
+        List<ActivityManager.RunningServiceInfo> data = manager.getRunningServices(Integer.MAX_VALUE)  ;
+
+        for(int i =0 ; i < data.size() ; i++){
+            services.add(""+data.get(i).service.getClassName().replace("com.apporioinfolabs.taxilocationlib.",""));
+        }
+
+        return  services;
+    }
 
     @SuppressLint("LongLogTag")
     public static void syncPhoneState() throws  Exception{
@@ -232,13 +290,21 @@ public abstract class ATSApplication extends Application  implements Application
         jsonObject.put("permissions",AppInfoManager.getPermissionWithStatus());
         jsonObject.put("app_state",app_state_jsno);
 
-        apiSynchroniesr.syncPhoneState(jsonObject);
+        atsApiSynchroniesr.syncPhoneState(jsonObject);
     }
 
     public static void syncActions(String action){
-        apiSynchroniesr.syncStraightAction(action);
+        atsApiSynchroniesr.syncStraightAction(action);
     }
 
+    public static void syncHyperLogsStach(String jsondata) throws Exception{
+        atsApiSynchroniesr.syncHyperLogStashFromService(jsondata, AtsConstants.SYNC_EXISTING_LOGS);
+
+    }
+
+    public static void syncAndDeleteLogsFromDatabse(String jsonData, int log_stach_id) throws Exception{
+        atsApiSynchroniesr.syncAndDeleteLogsFromDatabse(jsonData, log_stach_id, AtsConstants.SYNC_EXISTING_LOGS_FROM_DATABASE);
+    }
 
     @Override
     public void onActivityStarted(Activity activity) {
@@ -254,15 +320,17 @@ public abstract class ATSApplication extends Application  implements Application
 
         isActivityChangingConfigurations = activity.isChangingConfigurations();
         if (--activityReferences == 0 && !isActivityChangingConfigurations) {
-//            Toast.makeText(activity, "Enters in background | Pending logs"+HyperLog.hasPendingDeviceLogs()+" | Log count:"+HyperLog.getDeviceLogsCount(), Toast.LENGTH_LONG).show();
             app_foreground = false ;
-            try{syncLogsAccordingly();}catch (Exception e){
-                APPORIOLOGS.warningLog(TAG, ""+e.getMessage());
-            }
             removePreviousListeners();
+
+            if(logSyncOnAppMinimize){
+                Log.i(TAG , "Syncing logs on minimise");
+                try{syncLogsAccordingly();}catch (Exception e){
+                APPORIOLOGS.warningLog(TAG, ""+e.getMessage());
+            }}
+            else{Log.i(TAG , "On minimise logs is not synced");}
         }
     }
-
 
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
@@ -288,40 +356,6 @@ public abstract class ATSApplication extends Application  implements Application
     public void onActivityDestroyed(Activity activity) {
 
     }
-
-
-    public  static void syncLogsAccordingly() throws Exception{
-        Log.d(TAG, "Syncing Logs to Log panel");
-        apiSynchroniesr.syncLogsAccordingly();
-    }
-
-
-    private static boolean isServiceRunning() {
-
-        ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
-
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (service.service.getClassName().equals("com.apporioinfolabs.taxilocationlib.UpdateServiceClass")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    public static List<String> getListofRunningServices(){
-        List<String> services = new ArrayList<>();
-        ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
-
-        List<ActivityManager.RunningServiceInfo> data = manager.getRunningServices(Integer.MAX_VALUE)  ;
-
-        for(int i =0 ; i < data.size() ; i++){
-            services.add(""+data.get(i).service.getClassName().replace("com.apporioinfolabs.taxilocationlib.",""));
-        }
-
-        return  services;
-    }
-
 
     @Override
     public void onSyncSuccess(String action) {

@@ -19,7 +19,7 @@ import com.mindorks.placeholderview.PlaceHolderView;
 
 import java.util.List;
 
-public class DeviceListActivity extends Activity implements HolderDevices.OnClickListener{
+public class DeviceListActivity extends BaseActivity implements HolderDevices.OnClickListener{
 
     PlaceHolderView placeholder ;
     ProgressBar progress_circular ;

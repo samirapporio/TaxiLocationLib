@@ -17,8 +17,8 @@ public class AppInfoManager {
 
     public static JSONObject getApplicafionInfo (){
         JSONObject jsonObject = new JSONObject();
-        PackageManager pm = ATSApplication.mContext.getPackageManager() ;
-        String packagename = ATSApplication.mContext.getApplicationContext().getPackageName();
+        PackageManager pm = AtsApplication.mContext.getPackageManager() ;
+        String packagename = AtsApplication.mContext.getApplicationContext().getPackageName();
         try{
 
             jsonObject.put("package_name", ""+packagename);
@@ -35,13 +35,13 @@ public class AppInfoManager {
     }
 
     public static String getPackageName (){
-        return ""+ATSApplication.mContext.getApplicationContext().getPackageName();
+        return ""+ AtsApplication.mContext.getApplicationContext().getPackageName();
     }
 
     public static String getAppName() {
         try{
-            PackageManager pm = ATSApplication.mContext.getPackageManager() ;
-            String packagename = ATSApplication.mContext.getApplicationContext().getPackageName();
+            PackageManager pm = AtsApplication.mContext.getPackageManager() ;
+            String packagename = AtsApplication.mContext.getApplicationContext().getPackageName();
             return ""+(String) pm.getApplicationLabel(pm.getApplicationInfo(packagename, PackageManager.GET_META_DATA));
         }catch (Exception e ){
             // dont want to upload this as log
@@ -54,8 +54,8 @@ public class AppInfoManager {
 
 
     public static Drawable getApplicationLogo() throws Exception{
-        PackageManager pm = ATSApplication.mContext.getPackageManager() ;
-        String packagename = ATSApplication.mContext.getApplicationContext().getPackageName();
+        PackageManager pm = AtsApplication.mContext.getPackageManager() ;
+        String packagename = AtsApplication.mContext.getApplicationContext().getPackageName();
         return  pm.getApplicationLogo(pm.getApplicationInfo(packagename, PackageManager.GET_META_DATA));
     }
 
@@ -63,8 +63,8 @@ public class AppInfoManager {
 
         JSONArray permissionsarray = new JSONArray();
         try{
-            String packagename = ATSApplication.mContext.getApplicationContext().getPackageName();
-            PackageInfo packageInfo = ATSApplication.mContext.getPackageManager().getPackageInfo(packagename,PackageManager.GET_PERMISSIONS);
+            String packagename = AtsApplication.mContext.getApplicationContext().getPackageName();
+            PackageInfo packageInfo = AtsApplication.mContext.getPackageManager().getPackageInfo(packagename,PackageManager.GET_PERMISSIONS);
             for(int i = 0 ; i < packageInfo.requestedPermissions.length ; i++){
                 permissionsarray.put(new JSONObject().put("name",packageInfo.requestedPermissions[i]).put("status",hasPermission(packageInfo.requestedPermissions[i])));
 
@@ -77,7 +77,7 @@ public class AppInfoManager {
 
 
     private static boolean hasPermission(String permission) {
-        int res = ATSApplication.mContext.checkCallingOrSelfPermission(permission);
+        int res = AtsApplication.mContext.checkCallingOrSelfPermission(permission);
         return (res == PackageManager.PERMISSION_GRANTED);
     }
 

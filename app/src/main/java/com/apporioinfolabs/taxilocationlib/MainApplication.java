@@ -1,20 +1,16 @@
 package com.apporioinfolabs.taxilocationlib;
 
 import android.app.PendingIntent;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.StringRequestListener;
-import com.apporioinfolabs.synchroniser.ATSApplication;
+import com.apporioinfolabs.synchroniser.AtsApplication;
 import com.onesignal.OneSignal;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-public class MainApplication extends ATSApplication {
+public class MainApplication extends AtsApplication {
 
     public static String targetPlayerIdNotification = "NA";
     public final static String TAG = "MainApplication";
@@ -36,6 +32,19 @@ public class MainApplication extends ATSApplication {
     public boolean setDeveloperMode() {
         return true;
     }
+
+    @Override
+    public boolean setAutoLogSynchronization() {
+        return true;
+    }
+
+    @Override
+    public boolean setLogSyncOnAppMinimize() {
+        return false;
+    }
+
+    @Override
+    public boolean setSocketConnection() { return false; }
 
     @Override
     public int setSmallNotificationIcons() {
@@ -74,6 +83,7 @@ public class MainApplication extends ATSApplication {
 
     @Override
     public String dataSynced(String action) {
+        Toast.makeText(this, "Synced Action: "+action, Toast.LENGTH_SHORT).show();
         try{sendNotificationToTargetDebuggingDevice(targetPlayerIdNotification,action);}catch (Exception e){}
         return action;
     }

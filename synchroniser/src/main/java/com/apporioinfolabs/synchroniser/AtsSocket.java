@@ -1,11 +1,9 @@
 package com.apporioinfolabs.synchroniser;
 
 import android.os.Handler;
-import android.util.Log;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Ack;
-import com.github.nkzawa.socketio.client.Socket;
 
 public class AtsSocket {
 
@@ -21,8 +19,8 @@ public class AtsSocket {
 
     public void startListen(final String keyToListen, final OnAtsSocketListener onAtsSocketListener){
 
-        if(ATSApplication.getSocket().connected()){
-            ATSApplication.getSocket().emit(SocketListeners.REQUEST_LISTENER, ""+keyToListen, new Ack() {
+        if(AtsApplication.getSocket().connected()){
+            AtsApplication.getSocket().emit(SocketListeners.REQUEST_LISTENER, ""+keyToListen, new Ack() {
                 @Override
                 public void call(final Object... args) {
                     mHandler.post(new Runnable() {
@@ -30,8 +28,8 @@ public class AtsSocket {
                         public void run() {
                             if(args[0].equals("1")){
                                 onAtsSocketListener.onSuccessRegistrataion("Key registered Successfully: "+keyToListen);
-                                ATSApplication.removePreviousListeners();
-                                ATSApplication.getSocket().on(keyToListen, new Emitter.Listener() {
+                                AtsApplication.removePreviousListeners();
+                                AtsApplication.getSocket().on(keyToListen, new Emitter.Listener() {
                                     @Override
                                     public void call(final Object... margs) {
                                         mHandler.post(new Runnable() {
@@ -54,8 +52,8 @@ public class AtsSocket {
     }
 
     public void stopListen (final String keyToRemove , final OnAtsSocketListener onAtsSocketListener){
-        if(ATSApplication.getSocket().connected()){
-            ATSApplication.getSocket().emit(SocketListeners.REMOVE_LISTENER, keyToRemove, new Ack() {
+        if(AtsApplication.getSocket().connected()){
+            AtsApplication.getSocket().emit(SocketListeners.REMOVE_LISTENER, keyToRemove, new Ack() {
                 @Override
                 public void call(final Object... args) {
                     mHandler.post(new Runnable() {
@@ -63,7 +61,7 @@ public class AtsSocket {
                         public void run() {
                             if(args[0].equals("1")){
                                 onAtsSocketListener.onSuccessRegistrataion(keyToRemove+" removed successfully");
-                                ATSApplication.getSocket().off(keyToRemove);
+                                AtsApplication.getSocket().off(keyToRemove);
                             }else{
                                 onAtsSocketListener.onFailureRegistration("Unable to remove key: "+keyToRemove);
                             }
@@ -77,7 +75,7 @@ public class AtsSocket {
     }
 
     public void stopAllListenersListen(String key){
-        ATSApplication.getSocket().off(key);
+        AtsApplication.getSocket().off(key);
     }
 
     public interface OnAtsSocketListener{

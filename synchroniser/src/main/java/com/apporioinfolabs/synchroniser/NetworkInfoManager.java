@@ -38,7 +38,7 @@ public class NetworkInfoManager {
         try{
             jsonObject.put("network_connected", isNetworkConnected(context));
             jsonObject.put("internet_conneted",isInternetAvailable());
-            jsonObject.put("socket_connected",ATSApplication.isSocketConnected());
+            jsonObject.put("socket_connected", AtsApplication.isSocketConnected());
         }catch (Exception e){
             APPORIOLOGS.warningLog(TAG , ""+e.getMessage());
         }

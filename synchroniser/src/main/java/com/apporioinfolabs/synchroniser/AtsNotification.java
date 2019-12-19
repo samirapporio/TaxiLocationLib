@@ -43,7 +43,7 @@ public class AtsNotification {
 
     public AtsNotification(Context context){
         mContext = context ;
-        sharedPref = context.getSharedPreferences(ATSApplication.SHARED_PREFRENCE, Context.MODE_PRIVATE);
+        sharedPref = context.getSharedPreferences(AtsApplication.SHARED_PREFRENCE, Context.MODE_PRIVATE);
         mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         mSmallRemoteViews = new RemoteViews(mContext.getPackageName(), R.layout.custom_notification_small);
         mBigRemoteViews = new RemoteViews(mContext.getPackageName(), R.layout.custom_notification_big);
@@ -54,7 +54,7 @@ public class AtsNotification {
 
     //////////////// DEVELOPMENT VIEWS  ///////////////////////
     private Notification getDevelopmentNotificationForLessThanHoneyComb(){
-        mNotification = new Notification(ATSApplication.small_Icon, "Ticker text", System.currentTimeMillis());
+        mNotification = new Notification(AtsApplication.small_Icon, "Ticker text", System.currentTimeMillis());
         mNotification.contentView = mSmallRemoteViews;
 //        mNotification.contentIntent = getIntent();
         mNotification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
@@ -64,10 +64,10 @@ public class AtsNotification {
 
     private NotificationCompat.Builder getDevelopmentNotificationForMoreThanHoneyComb(){
 
-        mBuilder.setSmallIcon(ATSApplication.small_Icon)
+        mBuilder.setSmallIcon(AtsApplication.small_Icon)
                 .setAutoCancel(false)
                 .setOngoing(true)
-                .setContentIntent(ATSApplication.notificationClickIntent)
+                .setContentIntent(AtsApplication.notificationClickIntent)
                 .setContent(mSmallRemoteViews)
                 .setCustomBigContentView(mBigRemoteViews)
                 .setTicker("Ticker Text");
@@ -93,9 +93,9 @@ public class AtsNotification {
         intentOffline.putExtra("action",NotificationActionReceiver.ACTION_OFFLINE);
         PendingIntent pending_intent_offline = PendingIntent.getBroadcast(mContext,3,intentOffline,PendingIntent.FLAG_UPDATE_CURRENT);
         return mBuilder
-                .setSmallIcon(ATSApplication.small_Icon )
-                .setContentTitle(sharedPref.getBoolean(ATSApplication.DEVELOPER_MODE_KEY,false)?"Development Mode":"You are on duty now.")
-                    .setContentIntent(ATSApplication.notificationClickIntent)
+                .setSmallIcon(AtsApplication.small_Icon )
+                .setContentTitle(sharedPref.getBoolean(AtsApplication.DEVELOPER_MODE_KEY,false)?"Development Mode":"You are on duty now.")
+                    .setContentIntent(AtsApplication.notificationClickIntent)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText("Please wait system is fetching your location . . . ."));
 //                .addAction(R.drawable.apporio_logo,"ONLINE", pending_intent_online)
 //                .addAction(R.drawable.apporio_logo,"OFFLINE", pending_intent_offline)
@@ -120,7 +120,7 @@ public class AtsNotification {
         }else{
             NotifyNotification("Development Mode"
                     , "Loc.:"+event.getPojolocation().getLatitude()+","+event.getPojolocation().getLongitude()+", Ac:"+event.getPojolocation().getAccuracy()
-                    , event.pojolocation,ATSApplication.getSocket().connected(), getLocationLogsOnly().size());
+                    , event.pojolocation, AtsApplication.isSocketConnected(), getLocationLogsOnly().size());
         }
     }
 
@@ -131,7 +131,7 @@ public class AtsNotification {
 
     //////////////// RELEASE VIEWS  ///////////////////////
     private Notification getReleaseNotificationForLessThanHoneyComb(){
-        mNotification = new Notification(ATSApplication.small_Icon, "* * * * *", System.currentTimeMillis());
+        mNotification = new Notification(AtsApplication.small_Icon, "* * * * *", System.currentTimeMillis());
         mNotification.contentView = mSmallRemoteViews;
 //        mNotification.contentIntent = getIntent();
         mNotification.flags |= Notification.FLAG_NO_CLEAR; //Do not clear the notification
@@ -141,11 +141,11 @@ public class AtsNotification {
 
     private NotificationCompat.Builder getReleaseNotificationForMoreThanHoneyComb(){
 
-        mSmallRemoteViews.setImageViewResource(R.id.notification_icon, ATSApplication.large_icon);
-        mBuilder.setSmallIcon(ATSApplication.small_Icon)
+        mSmallRemoteViews.setImageViewResource(R.id.notification_icon, AtsApplication.large_icon);
+        mBuilder.setSmallIcon(AtsApplication.small_Icon)
                 .setAutoCancel(false)
                 .setOngoing(true)
-                .setContentIntent(ATSApplication.notificationClickIntent)
+                .setContentIntent(AtsApplication.notificationClickIntent)
                 .setContent(mSmallRemoteViews)
                 .setTicker("* * * * * *");
         return mBuilder ;
@@ -158,11 +158,11 @@ public class AtsNotification {
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
         return mBuilder
-                .setSmallIcon(ATSApplication.small_Icon)
-                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(),ATSApplication.large_icon))
+                .setSmallIcon(AtsApplication.small_Icon)
+                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), AtsApplication.large_icon))
                 .setContentTitle(""+AppInfoManager.getApplicafionInfo().get("app_name"))
-                    .setContentIntent(ATSApplication.notificationClickIntent)
-                .setStyle(new NotificationCompat.InboxStyle().addLine(ATSApplication.notificatioMakingOnlineText));
+                    .setContentIntent(AtsApplication.notificationClickIntent)
+                .setStyle(new NotificationCompat.InboxStyle().addLine(AtsApplication.notificatioMakingOnlineText));
     }
 
     private void startReleasedNotificationView(Service service) throws Exception{
@@ -182,8 +182,8 @@ public class AtsNotification {
             updateOreoAboveNotification(event.getPojolocation());
         }else{
             NotifyNotification(""+AppInfoManager.getApplicafionInfo().get("app_name")
-                    , ""+ATSApplication.notificatioOnlineText
-                    , event.pojolocation,ATSApplication.getSocket().connected(),getLocationLogsOnly().size());
+                    , ""+ AtsApplication.notificatioOnlineText
+                    , event.pojolocation, AtsApplication.isSocketConnected(),getLocationLogsOnly().size());
         }
     }
 
@@ -200,22 +200,22 @@ public class AtsNotification {
 
     private void updateOreoAboveNotification(Location location){
 
-        if (sharedPref.getBoolean(ATSApplication.DEVELOPER_MODE_KEY, false)) {
+        if (sharedPref.getBoolean(AtsApplication.DEVELOPER_MODE_KEY, false)) {
             mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(
-                    "Loc. Interval: "+ATSApplication.locationFetchInterval
+                    "Loc. Interval: "+ AtsApplication.locationFetchInterval
                     + ", Lat:"+location.getLatitude()
                     +", Long:"+location.getLongitude()
                     +", Accuracy:"+location.getAccuracy()
                     +", Speed:"+location.getSpeed()+"m/sec"+ ",   Bearing:"+location.getBearing()
-                    +", Socket state: "+(ATSApplication.getSocket().connected()? "Connected":"Disconnected")
-                    +", BTR:"+ATSApplication.BatteryLevel
+                    +", Socket state: "+(AtsApplication.isSocketConnected()? "Connected":"Disconnected")
+                    +", BTR:"+ AtsApplication.BatteryLevel
                     +", cashed Location : "+getLocationLogsOnly().size()
                     +", Total Logs : "+HyperLog.getDeviceLogsCount()
-                    +", SQL Rate:"+ATSApplication.getSqlLite().getLogTableCount()));
+                    +", SQL Rate:"+ AtsApplication.getSqlLite().getLogTableCount()));
             manager.notify(1, mBuilder.build());
         } else {
 
-            mBuilder.setStyle(new NotificationCompat.InboxStyle().addLine(""+ATSApplication.notificatioOnlineText));
+            mBuilder.setStyle(new NotificationCompat.InboxStyle().addLine(""+ AtsApplication.notificatioOnlineText));
             manager.notify(1, mBuilder.build());
         }
 
@@ -226,16 +226,16 @@ public class AtsNotification {
 
     private   void NotifyNotification(String title, String smallContent, Location location , boolean socket_Status, int totalCashedData){
 
-        if (sharedPref.getBoolean(ATSApplication.DEVELOPER_MODE_KEY, false)) {
-            mSmallRemoteViews.setImageViewResource(R.id.notification_icon,ATSApplication.large_icon);
+        if (sharedPref.getBoolean(AtsApplication.DEVELOPER_MODE_KEY, false)) {
+            mSmallRemoteViews.setImageViewResource(R.id.notification_icon, AtsApplication.large_icon);
             mSmallRemoteViews.setTextViewText(R.id.tittle_text, ""+title);
             mSmallRemoteViews.setTextViewText(R.id.content_text, ""+smallContent);
-            mBigRemoteViews.setImageViewResource(R.id.notification_logo, ATSApplication.large_icon);
+            mBigRemoteViews.setImageViewResource(R.id.notification_logo, AtsApplication.large_icon);
             mBigRemoteViews.setTextViewText(R.id.tittle_text, ""+title);
-            mBigRemoteViews.setTextViewText(R.id.location,   "Loc Interval: "+ATSApplication.locationFetchInterval+ ""+location.getLatitude()+","+location.getLongitude()+", BTR:"+ATSApplication.BatteryLevel);
+            mBigRemoteViews.setTextViewText(R.id.location,   "Loc Interval: "+ AtsApplication.locationFetchInterval+ ""+location.getLatitude()+","+location.getLongitude()+", BTR:"+ AtsApplication.BatteryLevel);
             mBigRemoteViews.setTextViewText(R.id.accuracy, String.format("%.2f", location.getAccuracy())   +" meter");
             mBigRemoteViews.setTextViewText(R.id.socket_connectivity, "Socket: "+ (socket_Status?"Connected":"Disconnected"));
-            mBigRemoteViews.setTextViewText(R.id.other_info, "Speed:"+location.getSpeed()+",  bearing:"+location.getBearing()+" m/sec"+", Total logs: "+totalCashedData +" SQL Rate:"+ATSApplication.getSqlLite().getLogTableCount());
+            mBigRemoteViews.setTextViewText(R.id.other_info, "Speed:"+location.getSpeed()+",  bearing:"+location.getBearing()+" m/sec"+", Total logs: "+totalCashedData +" SQL Rate:"+ AtsApplication.getSqlLite().getLogTableCount());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
                 mNotificationManager.notify(NOTIF_ID, mNotification);
             }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -270,9 +270,9 @@ public class AtsNotification {
 
     public void startNotificationView(Service service) throws Exception{
 
-//        APPORIOLOGS.debugLog(TAG , "DEVELOPER MODE --->  "+sharedPref.getBoolean(ATSApplication.DEVELOPER_MODE_KEY, false));
+//        APPORIOLOGS.debugLog(TAG , "DEVELOPER MODE --->  "+sharedPref.getBoolean(AtsApplication.DEVELOPER_MODE_KEY, false));
 
-        if (sharedPref.getBoolean(ATSApplication.DEVELOPER_MODE_KEY, false)) {
+        if (sharedPref.getBoolean(AtsApplication.DEVELOPER_MODE_KEY, false)) {
             startDevelopmentNotificationView(service);
         } else {
             startReleasedNotificationView(service);
@@ -280,7 +280,7 @@ public class AtsNotification {
     }
 
     public void updateNotificationView(AtsLocationEvent event) throws Exception{
-        if (sharedPref.getBoolean(ATSApplication.DEVELOPER_MODE_KEY, false)) {
+        if (sharedPref.getBoolean(AtsApplication.DEVELOPER_MODE_KEY, false)) {
             updateDevelopmentNotificationView(event);
         } else {
             updateReleasedNotificationView(event);

@@ -1,7 +1,9 @@
 package com.apporioinfolabs.taxilocationlib;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -14,13 +16,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.FragmentActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.apporioinfolabs.synchroniser.ATSApplication;
+import com.apporioinfolabs.synchroniser.AtsApplication;
 import com.apporioinfolabs.synchroniser.AtsEventBus;
 import com.apporioinfolabs.synchroniser.AtsSocket;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
@@ -36,7 +40,7 @@ import com.google.gson.GsonBuilder;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class MainActivity extends FragmentActivity implements  OnMapReadyCallback {
+public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
 
 
     EditText editText , edt_listen_box , log_input_edt;
@@ -86,11 +90,7 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
         unique_no_text.setText("Device UUID: "+Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(new Intent(this, UpdateServiceClass.class));
-        } else { // normal
-            startService(new Intent(this, UpdateServiceClass.class));
-        }
+
 
 
         select_log_type_layout.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +105,7 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
             @Override
             public void onClick(View view) {
                 try{
-                    ATSApplication.syncPhoneState();
+                    AtsApplication.syncPhoneState();
                 }catch (Exception e){
                     Toast.makeText(MainActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -120,7 +120,7 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
              if(editText.getText().toString().equals("")){
                  Toast.makeText(MainActivity.this, "Please Add some data to identify your device", Toast.LENGTH_SHORT).show();
              }   else{
-                 ATSApplication.setExtraData(""+editText.getText().toString());
+                 AtsApplication.setExtraData(""+editText.getText().toString());
              }
             }
         });
@@ -229,6 +229,7 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
         AtsEventBus.getDefault().register(this);
         setConnectivityStatusView();
         listenToTheEnteredKey();
+        checkLocationPermission();
     }
 
     @Override
@@ -276,6 +277,14 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
 
     }
 
+    private void startLocationService(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(new Intent(this, UpdateServiceClass.class));
+        } else { // normal
+            startService(new Intent(this, UpdateServiceClass.class));
+        }
+    }
+
 
     private void listenToTheEnteredKey(){
         if(edt_listen_box.getText().toString().equals("")){
@@ -309,7 +318,7 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
     }
 
     private void setConnectivityStatusView(){
-        if(ATSApplication.IS_SOCKET_CONNECTED){socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_connected_vector));}
+        if(AtsApplication.IS_SOCKET_CONNECTED){socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_connected_vector));}
         else{ socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_disconnected_vector));}
 
     }
@@ -322,6 +331,22 @@ public class MainActivity extends FragmentActivity implements  OnMapReadyCallbac
         }
     }
 
+    private void checkLocationPermission (){
+        if ( ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1122);
+        }else{
+            startLocationService();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == 1122 && grantResults[0]== 0){
+            startLocationService();
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

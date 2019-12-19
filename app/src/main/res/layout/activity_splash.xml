@@ -1,17 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="#EAEAEA"
     tools:context=".SplashActivity">
+
+
+
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="500dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_splash_vector"/>
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/apporio_logo"
+        android:layout_marginBottom="230dp"
+        android:layout_gravity="center"/>
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Fetching player ID . . . ."
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="30dp"
+        android:textColor="#0B4B90"
+        android:textSize="13dp"
+        fontPath="fonts/GoogleSans-Bold.ttf"
+        tools:ignore="MissingPrefix"
         android:id="@+id/loading_text"/>
 
-</LinearLayout>
+</FrameLayout>

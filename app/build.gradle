@@ -33,7 +33,7 @@ dependencies {
     implementation 'com.github.samirapporio:ApporioLogSystem:1.2'
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
     implementation 'com.google.firebase:firebase-analytics:17.2.0'
-
+    implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
     implementation 'com.onesignal:OneSignal:[3.11.2, 3.99.99]'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

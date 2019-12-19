@@ -30,7 +30,7 @@ public class DeviceInfoManager {
         try{
             jsonObject.put("serial",Build.SERIAL);
             jsonObject.put("model",Build.MODEL);
-            jsonObject.put("device_id", Settings.Secure.getString(ATSApplication.mContext.getContentResolver(), Settings.Secure.ANDROID_ID));
+            jsonObject.put("device_id", Settings.Secure.getString(AtsApplication.mContext.getContentResolver(), Settings.Secure.ANDROID_ID));
             jsonObject.put("manufacture",Build.MANUFACTURER);
             jsonObject.put("brand",Build.BRAND);
             jsonObject.put("type",Build.TYPE);

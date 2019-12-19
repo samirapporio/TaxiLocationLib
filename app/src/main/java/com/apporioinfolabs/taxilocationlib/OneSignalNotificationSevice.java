@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
-import com.apporioinfolabs.synchroniser.ATSApplication;
+import com.apporioinfolabs.synchroniser.AtsApplication;
 import com.apporioinfolabs.synchroniser.AtsConstants;
 import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationReceivedResult;
@@ -45,7 +45,7 @@ public class OneSignalNotificationSevice extends NotificationExtenderService {
         switch (action){
             case ""+ AtsConstants.SYNC_APP_STATE:
                 Log.i(TAG , "Need to sync App state here accordingly ");
-                ATSApplication.syncPhoneState();
+                AtsApplication.syncPhoneState();
                 break;
              case ""+AtsConstants.START_LOCATION_SERVICE:
                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -57,11 +57,11 @@ public class OneSignalNotificationSevice extends NotificationExtenderService {
             case ""+AtsConstants.STOP_LOCATION_SERVICE:
                 stopService(new Intent(this, UpdateServiceClass.class));
                 break;
-            case ""+AtsConstants.SYNC_ESISTING_LOGS:
-                ATSApplication.syncLogsAccordingly();
+            case ""+AtsConstants.SYNC_EXISTING_LOGS:
+                AtsApplication.syncLogsAccordingly();
                 break;
             case ""+AtsConstants.CLEAR_ONE_SIGNAL_NOTIFICATIONS:
-                ATSApplication.syncActions("clear_OneSignal_Notifications");
+                AtsApplication.syncActions("clear_OneSignal_Notifications");
                 OneSignal.clearOneSignalNotifications();
                 break;
             default:

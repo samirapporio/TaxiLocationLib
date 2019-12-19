@@ -12,13 +12,13 @@ public class OnConnectionInfoManager {
 
     public static JSONObject getDeviceAndApplicationInfo(){
         try{
-            ATSApplication.onConnectionObject.put("device_info", DeviceInfoManager.getDeviceInfo());
-            ATSApplication.onConnectionObject.put("application_info", AppInfoManager.getApplicafionInfo());
-            ATSApplication.onConnectionObject.put("services",ATSApplication.getGson().toJson(ATSApplication.getListofRunningServices()));
-            ATSApplication.onConnectionObject.put("device_timestamp",System.currentTimeMillis());
+            AtsApplication.onConnectionObject.put("device_info", DeviceInfoManager.getDeviceInfo());
+            AtsApplication.onConnectionObject.put("application_info", AppInfoManager.getApplicafionInfo());
+            AtsApplication.onConnectionObject.put("services", AtsApplication.getGson().toJson(AtsApplication.getListofRunningServices()));
+            AtsApplication.onConnectionObject.put("device_timestamp",System.currentTimeMillis());
         }catch (Exception e){
             APPORIOLOGS.warningLog(TAG , ""+e.getMessage());
         }
-       return ATSApplication.onConnectionObject ;
+       return AtsApplication.onConnectionObject ;
     }
 }

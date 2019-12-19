@@ -69,8 +69,8 @@ public class AtsLocationManager {
 
     private void createLocationRequest() {
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(ATSApplication.locationFetchInterval);
-        locationRequest.setFastestInterval(ATSApplication.locationFetchInterval);
+        locationRequest.setInterval(AtsApplication.locationFetchInterval);
+        locationRequest.setFastestInterval(AtsApplication.locationFetchInterval);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
 

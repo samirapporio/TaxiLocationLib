@@ -23,16 +23,17 @@ public class SocketListeners {
     public static Emitter.Listener onConnect = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            ATSApplication.IS_SOCKET_CONNECTED = true;
+            AtsApplication.IS_SOCKET_CONNECTED = true;
             Log.d(TAG, "Connected to socket server and emitting device info ");
             EventBus.getDefault().post(""+AtsEventBus.SOCKET_CONNECTED);
-            ATSApplication.getSocket().emit(CONNECT_DEVICE, OnConnectionInfoManager.getDeviceAndApplicationInfo(), new Ack() {
-                @Override
-                public void call(Object... args) {
-                    APPORIOLOGS.informativeLog(TAG, " - - "+ args[0]);
-                }
-            });
-
+            if(AtsApplication.isSocketConnection_allowed){
+                AtsApplication.getSocket().emit(CONNECT_DEVICE, OnConnectionInfoManager.getDeviceAndApplicationInfo(), new Ack() {
+                    @Override
+                    public void call(Object... args) {
+                        APPORIOLOGS.informativeLog(TAG, " - - "+ args[0]);
+                    }
+                });
+            }
         }
     };
 
@@ -41,7 +42,7 @@ public class SocketListeners {
     public static Emitter.Listener onDisconnected = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            ATSApplication.IS_SOCKET_CONNECTED = false;
+            AtsApplication.IS_SOCKET_CONNECTED = false;
             Log.d(TAG , "Disconnected to socket server");
             EventBus.getDefault().post(""+AtsEventBus.SOCKET_DISCONNECTED);
         }
@@ -52,25 +53,29 @@ public class SocketListeners {
 
 
     public static void emitLocation(JSONObject location){
-        ATSApplication.getSocket().emit(DEVICE_LOCATION, location, new Ack() {
-            @Override
-            public void call(Object... args) {
-                Log.i(TAG, " - - "+ args[0]);
+        if(AtsApplication.isSocketConnection_allowed){
+            AtsApplication.getSocket().emit(DEVICE_LOCATION, location, new Ack() {
+                @Override
+                public void call(Object... args) {
+                    Log.i(TAG, " - - "+ args[0]);
 
-            }
-        });
+                }
+            });
+        }
     }
 
 
     public static void emitCashedLocation ( JSONObject cashed_location){
+        if(AtsApplication.isSocketConnection_allowed){
+            AtsApplication.getSocket().emit(CASHED_LOCATION, cashed_location, new Ack() {
+                @Override
+                public void call(Object... args) {
+                    APPORIOLOGS.informativeLog(TAG, " - - "+ args[0]);
+                    EventBus.getDefault().post(new EventLocationSyncSuccess(true));
+                }
+            });
 
-        ATSApplication.getSocket().emit(CASHED_LOCATION, cashed_location, new Ack() {
-            @Override
-            public void call(Object... args) {
-                APPORIOLOGS.informativeLog(TAG, " - - "+ args[0]);
-                EventBus.getDefault().post(new EventLocationSyncSuccess(true));
-            }
-        });
+        }
     }
 
 

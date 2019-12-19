@@ -9,14 +9,11 @@ import android.net.ConnectivityManager;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.common.Priority;
-import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.apporioinfolabs.synchroniser.db.OfflineLogModel;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.google.gson.Gson;
 import com.hypertrack.hyperlog.HyperLog;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -24,7 +21,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -42,7 +38,6 @@ public abstract  class AtsLocationService extends Service  {
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
-
     }
 
     @Override
@@ -64,12 +59,12 @@ public abstract  class AtsLocationService extends Service  {
         }
 
 
-        if(ATSApplication.setIntervalRunningWhenVehicleStops){
-            APPORIOLOGS.debugLog(TAG, "Starting inner for updating location when driver is at stationary Point.");
-            mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), 0, ATSApplication.locationFetchInterval);
+        if(AtsApplication.setIntervalRunningWhenVehicleStops){
+            Log.d(TAG, "Starting inner for updating location when driver is at stationary Point.");
+            mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), 0, AtsApplication.locationFetchInterval);
         }
 
-        ATSApplication.syncActions("start_location_service");
+        AtsApplication.syncActions(""+AtsConstants.STOP_LOCATION_SERVICE);
 
         super.onCreate();
     }
@@ -88,44 +83,53 @@ public abstract  class AtsLocationService extends Service  {
     public void onMessageEvent(AtsLocationEvent event) {
 
         try{ atsNotification.updateNotificationView(event); }
-        catch (Exception e){ APPORIOLOGS.warningLog(TAG , ""+e.getMessage()); }
+        catch (Exception e){ Log.e(TAG , ""+e.getMessage()); }
 
-        Log.d("********* BATTERY LEVEL ", ""+ATSApplication.BatteryLevel);
+        Log.d("********* BATTERY LEVEL ", ""+ AtsApplication.BatteryLevel);
 
         APPORIOLOGS.locationLog(""+event.pojolocation.getLatitude()+
                 "__"+event.pojolocation.getLongitude()+
                 "__"+event.pojolocation.getAccuracy()+
                 "__"+event.pojolocation.getBearing()+
-                "__"+ATSApplication.BatteryLevel+
+                "__"+ AtsApplication.BatteryLevel+
                 "__"+event.pojolocation.getTime());
 
 
 
-        if(!ATSApplication.setIntervalRunningWhenVehicleStops){
+        if(!AtsApplication.setIntervalRunningWhenVehicleStops){
             onReceiveLocation(event.pojolocation);
 //            APPORIOLOGS.debugLog(""+TAG,"Sending location to developer code for running API : (When setIntervalRunningWhenVehicleStops = false)");
         }
 
 
-        ATSApplication.saveLocationInTempSession(event.getPojolocation().getLatitude(), event.getPojolocation().getLongitude() , event.getPojolocation().getAccuracy() , event.getPojolocation().getBearing() );
+        AtsApplication.saveLocationInTempSession(event.getPojolocation().getLatitude(), event.getPojolocation().getLongitude() , event.getPojolocation().getAccuracy() , event.getPojolocation().getBearing() );
 
 
-        if(ATSApplication.getSocket().connected()){
+        if(AtsApplication.isSocketConnected()){
             SocketListeners.emitLocation(getJSONObjectToEmit(event));
         }
 
         if(HyperLog.getDeviceLogsCount() >= 25){
-            try{ syncLogs(gson.toJson(HyperLog.getDeviceLogs(false)));}
-            catch (Exception e){ Log.e(TAG, "Exception while syncing: "+e.getMessage()); }
+            if(AtsApplication.autoLogSynchronization){
+                try{ AtsApplication.syncHyperLogsStach(gson.toJson(HyperLog.getDeviceLogs(false))); }
+                catch (Exception e){ Log.e(TAG, "Exception while syncing: "+e.getMessage()); }
+            }else{
+                HyperLog.deleteLogs();
+                Log.i(TAG, "Logs Ignored from sync as auto sync mode is off, also hyper og stack is clear");
+            }
         }
 
 
 
-        if(ATSApplication.getSqlLite().getLogTableCount() > 0){
-            // sync it in a sequential manner
-            List<OfflineLogModel> offlineLogs = ATSApplication.getSqlLite().getAllLogsFromTable();
-            try{ syncAndDeleteLogsFromDatabase(offlineLogs.get(0).get_log(),offlineLogs.get(0).get_id()); }
-            catch (Exception e){ Log.e(TAG , ""+e.getMessage());}
+        if(AtsApplication.getSqlLite().getLogTableCount() > 0){
+            if(AtsApplication.autoLogSynchronization){
+                // sync it in a sequential manner
+                List<OfflineLogModel> offlineLogs = AtsApplication.getSqlLite().getAllLogsFromTable();
+                try{
+                    AtsApplication.syncAndDeleteLogsFromDatabse(offlineLogs.get(0).get_log(),offlineLogs.get(0).get_id());
+                }
+                catch (Exception e){ Log.e(TAG , ""+e.getMessage());}
+            }
         }
 
     };
@@ -136,6 +140,7 @@ public abstract  class AtsLocationService extends Service  {
 //            sqliteDBHelper.clearOfflineStats();
         }
     };
+
 
     private JSONObject getJSONObjectToEmit (AtsLocationEvent event){
         try{
@@ -149,6 +154,7 @@ public abstract  class AtsLocationService extends Service  {
        return emiting_object;
     }
 
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -160,56 +166,16 @@ public abstract  class AtsLocationService extends Service  {
         atsLocationManager.stopLocationUpdates();
         EventBus.getDefault().unregister(this);
         super.onDestroy();
-        ATSApplication.syncActions("stop_location_service");
+        AtsApplication.syncActions("stop_location_service");
     }
 
     public abstract void onReceiveLocation(Location location);
 
-    public void syncLogs(String jsondata) throws Exception{
-        AndroidNetworking.post(""+ATSApplication.EndPoint_add_logs)
-                .addBodyParameter("timezone", TimeZone.getDefault().getID())
-                .addBodyParameter("key",jsondata)
-                .setTag("log_sync")
-                .setPriority(Priority.HIGH)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        HyperLog.deleteLogs();
-                    }
-                    @Override
-                    public void onError(ANError error) {
-                        Log.e(TAG, "Logs Not synced now saving things to Database"+error.getLocalizedMessage());
-                        ATSApplication.getSqlLite().addLogBunch(""+gson.toJson(HyperLog.getDeviceLogs(false)));
-                        HyperLog.deleteLogs();
-                    }
-                });
-    }
-
-    public void syncAndDeleteLogsFromDatabase(String jsonData, final int id) throws Exception{
-        AndroidNetworking.post(""+ATSApplication.EndPoint_add_logs)
-                .addBodyParameter("timezone", TimeZone.getDefault().getID())
-                .addBodyParameter("key",jsonData)
-                .setTag("log_sync")
-                .setPriority(Priority.HIGH)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        ATSApplication.getSqlLite().deleteLogsbyId(id);
-                    }
-                    @Override
-                    public void onError(ANError error) {
-                        Log.e(TAG, "Logs Not synced via call database");
-                    }
-                });
-
-    }
 
      class TimeDisplayTimerTask extends TimerTask{
         @Override
         public void run() {
-            HashMap<String, String> locationSession = ATSApplication.getLocationFromTempSession();
+            HashMap<String, String> locationSession = AtsApplication.getLocationFromTempSession();
             Location location = new Location(""+locationSession.get(""+AtsConstants.SessionKeys.Provider));
             location.setLatitude(Double.parseDouble(""+ locationSession.get(""+AtsConstants.SessionKeys.Latitude)));
             location.setLongitude(Double.parseDouble(""+ locationSession.get(""+AtsConstants.SessionKeys.Longitude)));
