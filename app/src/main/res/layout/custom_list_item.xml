@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -46,25 +47,22 @@
                 android:id="@+id/device_udid"
                 android:textStyle="bold"/>
 
-            <androidx.cardview.widget.CardView
+
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                app:cardCornerRadius="10dp"
-                android:backgroundTint="#3986F7">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ffffff"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"
-                    android:id="@+id/time_txt"
-                    android:textAllCaps="true"
-                    android:textSize="9dp"
-                    android:text="Dec 12 Fri." />
-            </androidx.cardview.widget.CardView>
+                android:textColor="#3986F7"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:id="@+id/time_txt"
+                android:textAllCaps="true"
+                android:textSize="9dp"
+                fontPath="fonts/GoogleSans-Bold.ttf"
+                tools:ignore="MissingPrefix"
+                android:text="Dec 12 Fri." />
 
 
 
@@ -72,6 +70,7 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:id="@+id/location_image"
+                android:visibility="gone"
                 android:src="@drawable/ic_location_not_permited"/>
 
 

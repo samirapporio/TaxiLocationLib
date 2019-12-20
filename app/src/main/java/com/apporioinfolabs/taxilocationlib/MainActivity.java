@@ -50,12 +50,11 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
     LinearLayout select_log_type_layout ;
     private final String [] log_levels = {"Debug","Warning","Error","Verbose","Information"};
     private int selectedlogLevel = 0;
-
     private final String TAG = "MainActivity";
-
     private AtsSocket atsSocket ;
     private GoogleMap mMap = null;
     private Gson gson ;
+    boolean SocketConnectionState = false  ;
     RequestQueue queue ;
 
 
@@ -212,13 +211,21 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
         });
 
 
-
-        findViewById(R.id.trialll).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fl_screen_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(edt_listen_box.getText().toString().equals("")){
+                    Toast.makeText(MainActivity.this, "Please add device unique no to listen it ", Toast.LENGTH_SHORT).show();
+                }else{
+                    startActivity(new Intent(MainActivity.this, FullMapViewActivity.class)
+                            .putExtra("LISTENING_KEY",""+edt_listen_box.getText().toString())
+                            .putExtra("SOCKET_STATE",SocketConnectionState));
+                }
 
             }
         });
+
+
 
 
     }
@@ -256,6 +263,8 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
                 }).create().show();
     }
 
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -270,9 +279,8 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
         if(mMap != null){
             mMap.clear();
             LatLng coordinate = new LatLng(latitude, longitude);
-            mMap.addMarker(new MarkerOptions().position(coordinate).title(""+latitude+", "+longitude));
+            MapUtils.adddot(this,mMap, coordinate);
             mMap.animateCamera( CameraUpdateFactory.newLatLngZoom(coordinate, 15));
-
         }
 
     }
@@ -325,8 +333,10 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
 
     private void changeSocketConnectionColor(String val){
         if(val.equals(""+AtsEventBus.SOCKET_CONNECTED)){
+            SocketConnectionState = true ;
             socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_connected_vector));
         }else if(val.equals(""+AtsEventBus.SOCKET_DISCONNECTED)){
+            SocketConnectionState = false ;
             socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_disconnected_vector));
         }
     }

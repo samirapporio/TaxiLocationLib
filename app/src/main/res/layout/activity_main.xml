@@ -8,29 +8,23 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginLeft="-2dp"
-        android:layout_marginRight="-2dp">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center|right">
+        android:orientation="horizontal"
+        android:gravity="center|right">
 
 
 
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_socket_disconnected_vector"
-                android:padding="7dp"
-                android:id="@+id/socket_connection_state"/>
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_socket_disconnected_vector"
+            android:padding="7dp"
+            android:id="@+id/socket_connection_state"/>
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
 
     <ScrollView
@@ -176,27 +170,33 @@
                 </LinearLayout>
 
 
-                <Button
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Add Log"
+                    android:padding="10dp"
+                    android:background="#9869F1"
+                    android:textColor="#ffffff"
                     android:id="@+id/add_log_btn"/>
+
             </LinearLayout>
 
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Trial"
-                android:id="@+id/trialll"/>
 
 
-            <Button
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Get Phone State"
+                android:gravity="center"
+                android:padding="20dp"
                 android:layout_margin="20dp"
+                android:background="#9869F1"
+                android:textColor="#ffffff"
+                fontPath="fonts/GoogleSans-Bold.ttf"
+                tools:ignore="MissingPrefix"
+                android:text="Sync Phone State to dashboard. "
                 android:id="@+id/phone_state"/>
+
 
 
 
@@ -242,17 +242,31 @@
                 android:gravity="center">
 
 
-                <androidx.cardview.widget.CardView
-                    android:layout_width="fill_parent"
-                    android:layout_height="200dp"
-                    android:layout_weight="1">
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
                     <fragment
                         android:id="@+id/map"
                         android:name="com.google.android.gms.maps.SupportMapFragment"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="200dp"
                         tools:context=".MapsActivity" />
-                </androidx.cardview.widget.CardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:id="@+id/fl_screen_btn"
+                        android:text="Full Screen"
+                        android:background="#ffffff"
+                        android:layout_gravity="bottom|right"
+                        android:layout_margin="10dp"
+                        fontPath="fonts/GoogleSans-Bold.ttf"
+                        tools:ignore="MissingPrefix"/>
+
+                </FrameLayout>
+
+
 
 
                 <LinearLayout

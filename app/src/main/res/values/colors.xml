@@ -3,4 +3,21 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+
+
+        <color name="white">#ffffff</color>
+        <color name="muted_black">#333333</color>
+        <color name="one_signal_logo_color">#D1313A</color>
+        <color name="muted_green">#2ECC71</color>
+        <color name="muted_red">#E74C3C</color>
+        <color name="muted_violet">#9B59B6</color>
+        <color name="muted_orange">#E67E22</color>
+        <color name="muted_orange_dark">#924706</color>
+        <color name="muted_transparent_orange">#8FE67E22</color>
+        <color name="muted_blue">#1E88E5</color>
+        <color name="muted_grey">#bbbbbb</color>
+
+
+
 </resources>
