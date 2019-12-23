@@ -43,7 +43,6 @@ dependencies {
     annotationProcessor 'com.mindorks.android:placeholderview-compiler:1.0.3'
 
 
-
 }
 
 apply plugin: 'com.google.gms.google-services'

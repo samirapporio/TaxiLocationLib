@@ -140,7 +140,7 @@ public class AtsApiSynchroniesr {
                         AtsApplication.getSqlLite().addLogBunch(""+ AtsApplication.getGson().toJson(HyperLog.getDeviceLogs(false)));
                         HyperLog.deleteLogs();
                         onSync.onSyncError("Logs Not synced now saving things to Database"+error.getLocalizedMessage());
-                        Log.e(TAG, "Logs not synced so transferred it into SQL rate Database"+"  |  ERROR: "+ error.getMessage());
+
                     }
                 });
 

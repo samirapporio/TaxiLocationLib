@@ -11,10 +11,12 @@ import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Build;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
+import com.apporioinfolabs.synchroniser.db.OfflineLogModel;
 import com.hypertrack.hyperlog.DeviceLogModel;
 import com.hypertrack.hyperlog.HyperLog;
 
@@ -211,7 +213,7 @@ public class AtsNotification {
                     +", BTR:"+ AtsApplication.BatteryLevel
                     +", cashed Location : "+getLocationLogsOnly().size()
                     +", Total Logs : "+HyperLog.getDeviceLogsCount()
-                    +", SQL Rate:"+ AtsApplication.getSqlLite().getLogTableCount()));
+                    +", "+ getSqlRate()));
             manager.notify(1, mBuilder.build());
         } else {
 
@@ -235,7 +237,7 @@ public class AtsNotification {
             mBigRemoteViews.setTextViewText(R.id.location,   "Loc Interval: "+ AtsApplication.locationFetchInterval+ ""+location.getLatitude()+","+location.getLongitude()+", BTR:"+ AtsApplication.BatteryLevel);
             mBigRemoteViews.setTextViewText(R.id.accuracy, String.format("%.2f", location.getAccuracy())   +" meter");
             mBigRemoteViews.setTextViewText(R.id.socket_connectivity, "Socket: "+ (socket_Status?"Connected":"Disconnected"));
-            mBigRemoteViews.setTextViewText(R.id.other_info, "Speed:"+location.getSpeed()+",  bearing:"+location.getBearing()+" m/sec"+", Total logs: "+totalCashedData +" SQL Rate:"+ AtsApplication.getSqlLite().getLogTableCount());
+            mBigRemoteViews.setTextViewText(R.id.other_info, "Speed:"+location.getSpeed()+",  bearing:"+location.getBearing()+" m/sec"+", Total logs: "+totalCashedData +" "+ getSqlRate());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
                 mNotificationManager.notify(NOTIF_ID, mNotification);
             }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -286,6 +288,22 @@ public class AtsNotification {
             updateReleasedNotificationView(event);
         }
 
+    }
+
+    private String getSqlRate(){
+        List<OfflineLogModel> data = AtsApplication.getSqlLite().getAllLogsFromTable();
+        int success_stash_count = 0;
+        int failed_stash_count = 0 ;
+        for(int i =0 ; i < data.size() ; i++){
+
+            if(data.get(i).get_log() == null || data.get(i).get_log().equals(null) || data.get(i).get_log().startsWith("null") ){
+                failed_stash_count = failed_stash_count + 1;
+            }else{
+                success_stash_count = success_stash_count + 1 ;
+            }
+        }
+
+        return "SQL S Rate: "+success_stash_count+" SQL F Rate: "+failed_stash_count;
     }
 
 

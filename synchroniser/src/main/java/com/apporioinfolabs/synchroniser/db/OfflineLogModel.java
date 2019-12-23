@@ -19,13 +19,6 @@ public class OfflineLogModel {
         this._log = _log;
     }
 
-    public int getID(){
-        return this._id;
-    }
-
-    public void setID(int id){
-        this._id = id;
-    }
 
     public int get_id() {
         return this._id;
@@ -39,9 +32,6 @@ public class OfflineLogModel {
         return this._log;
     }
 
-    public void set_latitude(String _log) {
-        this._log = _log;
-    }
 
 
 }

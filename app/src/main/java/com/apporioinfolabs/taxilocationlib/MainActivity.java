@@ -226,6 +226,12 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
         });
 
 
+        findViewById(R.id.view_sql_rate_stash).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.this.startActivity(new Intent(MainActivity.this, SqllogsStashActivity.class));
+            }
+        });
 
 
     }

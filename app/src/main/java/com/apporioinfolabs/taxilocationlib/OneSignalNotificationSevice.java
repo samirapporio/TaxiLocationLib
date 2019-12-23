@@ -26,16 +26,23 @@ public class OneSignalNotificationSevice extends NotificationExtenderService {
 
             Log.d(TAG , "---------> "+receivedResult.payload.additionalData);
 
-            try {
-                String data  = ""+receivedResult.payload.additionalData.getString("data" );
-                JSONObject jsonObject = new JSONObject(data);
-                doActioAccordingToState (""+jsonObject.getString("action"));
-                MainApplication.targetPlayerIdNotification = ""+jsonObject.getString("player_id");
-            } catch (Exception e) {
-                Log.e(TAG , ""+e.getMessage());
-            }
+            try { parseLibraryAction(""+receivedResult.payload.additionalData.getString("data" )); }
+            catch (Exception e) { Log.e(TAG , ""+e.getMessage()); }
         }
         return false ;
+    }
+
+
+
+    @SuppressLint("LongLogTag")
+    private void parseLibraryAction (String notificatoin_data) throws Exception{
+        try {
+            JSONObject jsonObject = new JSONObject(notificatoin_data);
+            doActioAccordingToState (""+jsonObject.getString("action"));
+            MainApplication.targetPlayerIdNotification = ""+jsonObject.getString("player_id");
+        } catch (Exception e) {
+            Log.e(TAG , ""+e.getMessage());
+        }
     }
 
 

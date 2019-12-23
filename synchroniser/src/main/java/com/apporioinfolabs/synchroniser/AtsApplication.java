@@ -51,6 +51,7 @@ public abstract class AtsApplication extends Application  implements Application
     public static boolean autoLogSynchronization = false ;
     public static boolean logSyncOnAppMinimize = true ;
     public static boolean isSocketConnection_allowed = true ;
+    public static boolean isLiveLogsAllowed = true ;
     public static JSONObject onConnectionObject ;
     public static String UNIQUE_NO  = "";
     public static boolean IS_SOCKET_CONNECTED = false ;
@@ -109,6 +110,7 @@ public abstract class AtsApplication extends Application  implements Application
         autoLogSynchronization = setAutoLogSynchronization();
         logSyncOnAppMinimize = setLogSyncOnAppMinimize();
         isSocketConnection_allowed = setSocketConnection();
+        isLiveLogsAllowed = allowLiveLogs();
 
         if(isSocketConnection_allowed){
             try{ connectToSocketServer(); }
@@ -173,6 +175,7 @@ public abstract class AtsApplication extends Application  implements Application
     public abstract boolean setAutoLogSynchronization ();
     public abstract boolean setLogSyncOnAppMinimize ();
     public abstract boolean setSocketConnection();
+    public abstract boolean allowLiveLogs();
 
 
 

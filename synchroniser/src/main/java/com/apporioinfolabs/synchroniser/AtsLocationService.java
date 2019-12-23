@@ -19,6 +19,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -121,12 +122,12 @@ public abstract  class AtsLocationService extends Service  {
 
 
 
-        if(AtsApplication.getSqlLite().getLogTableCount() > 0){
+        if(getSuccessSqlStach().size() > 0){
             if(AtsApplication.autoLogSynchronization){
                 // sync it in a sequential manner
-                List<OfflineLogModel> offlineLogs = AtsApplication.getSqlLite().getAllLogsFromTable();
+                OfflineLogModel offlineLogModel = getSuccessSqlStach().get(0);
                 try{
-                    AtsApplication.syncAndDeleteLogsFromDatabse(offlineLogs.get(0).get_log(),offlineLogs.get(0).get_id());
+                    AtsApplication.syncAndDeleteLogsFromDatabse(offlineLogModel.get_log() ,offlineLogModel.get_id());
                 }
                 catch (Exception e){ Log.e(TAG , ""+e.getMessage());}
             }
@@ -168,6 +169,22 @@ public abstract  class AtsLocationService extends Service  {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
         AtsApplication.syncActions("stop_location_service");
+    }
+
+    private List<OfflineLogModel> getSuccessSqlStach(){
+        List<OfflineLogModel> data = AtsApplication.getSqlLite().getAllLogsFromTable();
+        List<OfflineLogModel> success_stash = new ArrayList<>();
+        List<OfflineLogModel> failed_stash = new ArrayList<>();
+
+        for(int i =0 ; i < data.size() ; i++){
+
+            if(data.get(i).get_log() == null || data.get(i).get_log().equals(null) || data.get(i).get_log().startsWith("null") ){
+                failed_stash.add(data.get(i));
+            }else{
+                success_stash.add(data.get(i));
+            }
+        }
+        return success_stash ;
     }
 
     public abstract void onReceiveLocation(Location location);

@@ -45,6 +45,11 @@ public class MainApplication extends AtsApplication {
     public boolean setSocketConnection() { return true; }
 
     @Override
+    public boolean allowLiveLogs() {
+        return true;
+    }
+
+    @Override
     public int setSmallNotificationIcons() {
         return R.drawable.notification_icon;
     }

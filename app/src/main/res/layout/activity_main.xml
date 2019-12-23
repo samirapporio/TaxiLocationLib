@@ -198,6 +198,18 @@
                 android:id="@+id/phone_state"/>
 
 
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:background="#5B349E"
+                android:gravity="center"
+                android:id="@+id/view_sql_rate_stash"
+                android:padding="20dp"
+                android:text="View SQL Rate Stash"
+                android:textColor="#ffffff"/>
+
+
 
 
             <LinearLayout

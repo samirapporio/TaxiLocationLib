@@ -17,6 +17,7 @@ public class SocketListeners {
     public static final String CASHED_LOCATION = "cashed_location" ;
     public static final String REQUEST_LISTENER = "request_listener" ;
     public static final String REMOVE_LISTENER = "remove_listener" ;
+    public static final String LIVE_LOG = "live_log" ;
 
 
 
@@ -50,15 +51,12 @@ public class SocketListeners {
 
 
 
-
-
     public static void emitLocation(JSONObject location){
         if(AtsApplication.isSocketConnection_allowed){
             AtsApplication.getSocket().emit(DEVICE_LOCATION, location, new Ack() {
                 @Override
                 public void call(Object... args) {
                     Log.i(TAG, " - - "+ args[0]);
-
                 }
             });
         }
@@ -79,6 +77,23 @@ public class SocketListeners {
     }
 
 
+
+    public static void emitLog(String log){
+        if(AtsApplication.isSocketConnection_allowed && AtsApplication.isLiveLogsAllowed){
+            if(AtsApplication.getSocket().connected()){
+                AtsApplication.getSocket().emit(LIVE_LOG, log, new Ack() {
+                    @Override
+                    public void call(Object... args) {
+                        Log.i(TAG, " - - "+ args[0]);
+                    }
+                });
+            }else{
+                Log.d(TAG, "Socket is not connected for emitting live logs. ");
+            }
+        }else{
+            Log.i(TAG , "Either Socket Connection or live logs are not allowed. ");
+        }
+    }
 
 
 
