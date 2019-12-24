@@ -6,13 +6,81 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
+    android:background="#F8F8F8"
     tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:orientation="horizontal"
+        android:background="#FFFFFF"
         android:gravity="center|right">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="10dp"
+            android:src="@drawable/app_logo"/>
+
+
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:gravity="center|left"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#333333"
+                    android:textSize="13dp"
+                    android:text="Your Device will identified by"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Unique No - "
+                    android:textSize="10dp"
+                    fontPath="fonts/GoogleSans-Bold.ttf"
+                    tools:ignore="MissingPrefix"
+                    android:textColor="#15A8CA"
+                    android:id="@+id/unique_no_text"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:id="@+id/share_unique_no">
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_share_vector"
+                    android:tint="@color/colorPrimary"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10dp"
+                    fontPath="fonts/GoogleSans-Bold.ttf"
+                    tools:ignore="MissingPrefix"
+                    android:textColor="@color/colorPrimary"
+                    android:text="Share UUID"/>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+
 
 
 
@@ -38,14 +106,7 @@
             android:gravity="center"
             android:layout_marginTop="20dp"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Unique No - "
-                android:textSize="15dp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:id="@+id/unique_no_text"/>
+
 
 
             <LinearLayout
@@ -58,20 +119,23 @@
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:layout_weight="1"
-                    android:background="#bbbbbb"
+                    android:background="#333333"
                     android:layout_margin="10dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Testing Log part"/>
+                    android:text="Application Logs"
+                    fontPath="fonts/GoogleSans-Bold.ttf"
+                    tools:ignore="MissingPrefix"
+                    android:textColor="#333333"/>
 
 
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:layout_weight="1"
-                    android:background="#bbbbbb"
+                    android:background="#333333"
                     android:layout_margin="10dp"/>
 
 
@@ -80,134 +144,284 @@
 
 
 
-
-
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
+                android:orientation="vertical"
+                android:padding="20dp"
                 android:gravity="center">
-                <EditText
+
+                <TextView
                     android:layout_width="fill_parent"
-                    android:layout_height="40dp"
-                    android:background="#E4E4E4"
-                    android:layout_weight="1"
-                    android:id="@+id/edittext"
-                    android:hint="e.g. Add your full name"
-                    android:paddingLeft="5dp"
-                    android:textSize="13dp"
-                    android:layout_margin="20dp"/>
-
-
-                <Button
-                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:text="Add Extra Data"
-                    android:id="@+id/extra_data"/>
+                    fontPath="fonts/GoogleSans-Bold.ttf"
+                    tools:ignore="MissingPrefix"
+                    android:text="(1) Set Extra Data"
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#333333"
+                    android:textSize="12dp"
+                    android:text="you can set an personal identifier with this application, This will help you to search device easily over dashboard app."/>
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:textColor="#009688"
+                    android:text="(by default we have already set it over splash screen)"/>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center">
+
+                    <EditText
+                        android:layout_width="fill_parent"
+                        android:layout_height="40dp"
+                        android:background="#E4E4E4"
+                        android:layout_weight="1"
+                        android:id="@+id/edittext"
+                        android:hint="e.g. Add your full name"
+                        android:paddingLeft="5dp"
+                        android:layout_marginRight="10dp"
+                        android:textSize="13dp"/>
+
+
+                    <TextView
+                        android:layout_width="150dp"
+                        android:layout_height="40dp"
+                        android:text="Add Extra Data"
+                        android:gravity="center"
+                        android:background="#707070"
+                        android:textColor="#ffffff"
+                        android:id="@+id/extra_data"/>
+                </LinearLayout>
+
             </LinearLayout>
 
 
 
 
+
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:gravity="center">
+                android:orientation="vertical"
+                android:padding="20dp">
+
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    fontPath="fonts/GoogleSans-Bold.ttf"
+                    tools:ignore="MissingPrefix"
+                    android:text="(2) Log Tester"
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#333333"
+                    android:textSize="10dp"
+                    android:text="Library Itself contains 4 types of logs (debug, informative , warning , error), you can test it by adding any selecting any kind of log and add message to it, this will sync log to dashboard according to the library setting applied by developer "/>
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        fontPath="fonts/GoogleSans-Bold.ttf"
+                        tools:ignore="MissingPrefix"
+                        android:textColor="#009688"
+                        android:text="Auto Logs Sync"/>
+
+                    <Switch
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:id="@+id/autoSyncSwitch"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        fontPath="fonts/GoogleSans-Bold.ttf"
+                        tools:ignore="MissingPrefix"
+                        android:textColor="#009688"
+                        android:text="Live Logs"/>
+
+                    <Switch
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:id="@+id/liveLogsSwitch"/>
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        fontPath="fonts/GoogleSans-Bold.ttf"
+                        tools:ignore="MissingPrefix"
+                        android:textColor="#009688"
+                        android:text="Sync Logs On App Minimise"/>
+
+                    <Switch
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:id="@+id/synclogsonminimiseSwitch"/>
+                </LinearLayout>
+
+
+
+
+
 
                 <LinearLayout
                     android:layout_width="fill_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="7dp"
+                    android:gravity="center">
+
 
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:id="@+id/select_log_type_layout">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="12dp"
-                            android:id="@+id/log_level_text"
-                            android:textColor="#333333"
-                            android:text="Debug bug"/>
-                        <ImageView
-                            android:layout_width="10dp"
-                            android:layout_height="10dp"
-                            android:layout_marginLeft="10dp"
-                            android:tint="#333333"
-                            android:src="@drawable/ic_sort_down_vector"/>
+                        android:layout_width="fill_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content">
 
-                        <TextView
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="11dp"
-                            android:layout_marginLeft="10dp"
-                            android:textColor="#8B2F54"
-                            android:text="( Tag = MainActivity )"/>
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:id="@+id/select_log_type_layout">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="12dp"
+                                android:id="@+id/log_level_text"
+                                fontPath="fonts/GoogleSans-Bold.ttf"
+                                tools:ignore="MissingPrefix"
+                                android:textColor="#333333"
+                                android:text="Debug bug"/>
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:layout_marginLeft="10dp"
+                                android:tint="#333333"
+                                android:src="@drawable/ic_sort_down_vector"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="11dp"
+                                android:layout_marginLeft="10dp"
+                                android:textColor="#8B2F54"
+                                android:text="( Tag = MainActivity )"/>
+
+
+                        </LinearLayout>
+
+
+                        <EditText
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Your log value"
+                            android:id="@+id/log_input_edt"
+                            android:textSize="13dp"/>
+
 
 
                     </LinearLayout>
 
 
-                    <EditText
-                        android:layout_width="fill_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="Your log value"
-                        android:id="@+id/log_input_edt"
-                        android:textSize="13dp"/>
-
-
+                        android:text="Add Log"
+                        android:padding="10dp"
+                        android:background="#9869F1"
+                        android:textColor="#ffffff"
+                        android:id="@+id/add_log_btn"/>
 
                 </LinearLayout>
-
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add Log"
-                    android:padding="10dp"
+                    android:textSize="11dp"
+                    android:textColor="#E92044"
+                    android:text="Please register Tags over dashboard in order to save it view later"/>
+
+
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:gravity="center"
+                    android:layout_weight="1"
                     android:background="#9869F1"
                     android:textColor="#ffffff"
-                    android:id="@+id/add_log_btn"/>
+                    fontPath="fonts/GoogleSans-Bold.ttf"
+                    tools:ignore="MissingPrefix"
+                    android:layout_marginRight="5dp"
+                    android:text="Sync Phone State"
+                    android:id="@+id/phone_state"/>
+
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="#5B349E"
+                    android:gravity="center"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/view_sql_rate_stash"
+                    fontPath="fonts/GoogleSans-Bold.ttf"
+                    tools:ignore="MissingPrefix"
+                    android:text="View SQL Rate Stash"
+                    android:textColor="#ffffff"/>
 
             </LinearLayout>
 
 
 
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="20dp"
-                android:layout_margin="20dp"
-                android:background="#9869F1"
-                android:textColor="#ffffff"
-                fontPath="fonts/GoogleSans-Bold.ttf"
-                tools:ignore="MissingPrefix"
-                android:text="Sync Phone State to dashboard. "
-                android:id="@+id/phone_state"/>
-
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:background="#5B349E"
-                android:gravity="center"
-                android:id="@+id/view_sql_rate_stash"
-                android:padding="20dp"
-                android:text="View SQL Rate Stash"
-                android:textColor="#ffffff"/>
 
 
 
@@ -216,18 +430,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_marginTop="20dp"
                 android:gravity="center">
 
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:layout_weight="1"
-                    android:background="#bbbbbb"
+                    android:background="#333333"
                     android:layout_margin="10dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="#333333"
+                    fontPath="fonts/GoogleSans-Bold.ttf"
+                    tools:ignore="MissingPrefix"
                     android:text="Socket part"/>
 
 
@@ -235,7 +453,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:layout_weight="1"
-                    android:background="#bbbbbb"
+                    android:background="#333333"
                     android:layout_margin="10dp"/>
 
 
@@ -270,7 +488,8 @@
                         android:padding="10dp"
                         android:id="@+id/fl_screen_btn"
                         android:text="Full Screen"
-                        android:background="#ffffff"
+                        android:textColor="#ffffff"
+                        android:background="@color/colorPrimaryDark"
                         android:layout_gravity="bottom|right"
                         android:layout_margin="10dp"
                         fontPath="fonts/GoogleSans-Bold.ttf"
@@ -280,6 +499,15 @@
 
 
 
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10dp"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:text="Note: you can listen any key in here in order to test socket listening and use this api for emitting data  http://13.233.98.63:3005/api/v1/sockets_api/trial_emit?emission_key=YOUR_KEY&amp;data=YOUR_DATA"/>
 
                 <LinearLayout
                     android:layout_width="fill_parent"
@@ -328,11 +556,11 @@
                             android:layout_width="fill_parent"
                             android:layout_height="49dp"
                             android:background="#ffffff"
-                            android:hint="Enter key To listen"
+                            android:hint="Select device or Enter key To listen"
                             android:padding="5dp"
                             android:layout_weight="1"
 
-                            android:textSize="13dp"
+                            android:textSize="11dp"
                             android:paddingLeft="5dp"
                             android:id="@+id/edt_listen_box"
                             android:layout_marginRight="5dp"/>
@@ -348,12 +576,12 @@
 
 
                         <Button
-                            android:layout_width="wrap_content"
+                            android:layout_width="100dp"
                             android:layout_height="fill_parent"
                             android:background="#333333"
-                            android:paddingLeft="3dp"
-                            android:paddingRight="3dp"
-                            android:text="Remove Listeners"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:text="Remove this listeners only"
                             android:textColor="#ffffff"
                             android:textSize="9dp"
                             android:layout_marginLeft="5dp"
@@ -372,11 +600,25 @@
                 </LinearLayout>
 
 
+
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    fontPath="fonts/GoogleSans-Bold.ttf"
+                    tools:ignore="MissingPrefix"
+                    android:textSize="12dp"
+                    android:gravity="center|left"
+                    android:layout_marginTop="15dp"
+                    android:text="Incoming emitted Data from server."
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/fetched_text"
                     android:textSize="12dp"
+                    android:textColor="#333333"
+                    android:gravity="center|left"
                     android:text=" - - - - - - - - - -"/>
 
 

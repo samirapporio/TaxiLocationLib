@@ -49,20 +49,7 @@
 
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#3986F7"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:id="@+id/time_txt"
-                android:textAllCaps="true"
-                android:textSize="9dp"
-                fontPath="fonts/GoogleSans-Bold.ttf"
-                tools:ignore="MissingPrefix"
-                android:text="Dec 12 Fri." />
+
 
 
 
@@ -77,6 +64,41 @@
         </LinearLayout>
 
 
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            fontPath="fonts/GoogleSans-Bold.ttf"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="8dp"
+            android:paddingTop="3dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="3dp"
+            android:text="Connected Since"
+            android:textColor="#3986F7"
+            android:textSize="9dp"
+            tools:ignore="MissingPrefix" />
+        <TextView
+            android:id="@+id/time_txt"
+            fontPath="fonts/GoogleSans-Bold.ttf"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="8dp"
+            android:paddingTop="3dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="3dp"
+            android:text="Dec 12 Fri."
+            android:textAllCaps="true"
+            android:textColor="#3986F7"
+            android:textSize="9dp"
+            tools:ignore="MissingPrefix" />
     </LinearLayout>
 
 

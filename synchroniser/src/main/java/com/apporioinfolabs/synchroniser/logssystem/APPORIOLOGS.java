@@ -1,7 +1,5 @@
 package com.apporioinfolabs.synchroniser.logssystem;
 
-import android.util.Log;
-
 import com.apporioinfolabs.synchroniser.SocketListeners;
 import com.hypertrack.hyperlog.HyperLog;
 

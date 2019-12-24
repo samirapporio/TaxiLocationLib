@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +26,7 @@ import androidx.core.content.ContextCompat;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.apporioinfolabs.synchroniser.ApporioTrackingSystem;
 import com.apporioinfolabs.synchroniser.AtsApplication;
 import com.apporioinfolabs.synchroniser.AtsEventBus;
 import com.apporioinfolabs.synchroniser.AtsSocket;
@@ -48,6 +51,7 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
     ImageView  socket_connection_state , device_image ;
     ProgressBar device_progress_fetch ;
     LinearLayout select_log_type_layout ;
+    Switch autoSyncSwitch, liveLogsSwitch , synclogsonminimiseSwitch;
     private final String [] log_levels = {"Debug","Warning","Error","Verbose","Information"};
     private int selectedlogLevel = 0;
     private final String TAG = "MainActivity";
@@ -73,6 +77,9 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
         device_fetch_text = findViewById(R.id.device_fetch_text);
         device_image = findViewById(R.id.device_image);
         device_progress_fetch = findViewById(R.id.device_progress_fetch);
+        autoSyncSwitch = findViewById(R.id.autoSyncSwitch);
+        liveLogsSwitch = findViewById(R.id.liveLogsSwitch);
+        synclogsonminimiseSwitch = findViewById(R.id.synclogsonminimiseSwitch);
 
 
         socket_connection_state = findViewById(R.id.socket_connection_state);
@@ -87,6 +94,20 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
 
 
         unique_no_text.setText("Device UUID: "+Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+
+
+
+
+        autoSyncSwitch.setChecked(ApporioTrackingSystem.isAutoLogSynchroniserEnable());
+        liveLogsSwitch.setChecked(ApporioTrackingSystem.isLiveLogsEnable());
+        synclogsonminimiseSwitch.setChecked(ApporioTrackingSystem.isLogsSyncOnAppMinimise());
+
+        autoSyncSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                ApporioTrackingSystem.setAutoLogSyncable(b);
+            }
+        });
 
 
 
@@ -233,6 +254,19 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
             }
         });
 
+        findViewById(R.id.share_unique_no).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, ""+Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+                sendIntent.setType("text/plain");
+
+                Intent shareIntent = Intent.createChooser(sendIntent, null);
+                startActivity(shareIntent);
+            }
+        });
+
 
     }
 
@@ -311,7 +345,8 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
                     fetched_text.setText(""+message);
                     try{
                         ModelLocationIncoming modelLocationIncoming = gson.fromJson(""+message,ModelLocationIncoming.class);
-                        fetched_text.setText(""+modelLocationIncoming.getLocation().getLatitude()+", "+modelLocationIncoming.getLocation().getLongitude());
+                        fetched_text.setText(""+message);
+//                        fetched_text.setText(""+modelLocationIncoming.getLocation().getLatitude()+", "+modelLocationIncoming.getLocation().getLongitude());
                         setMarkerandMapCamera(modelLocationIncoming.getLocation().getLatitude(), modelLocationIncoming.getLocation().getLongitude());
                     }catch (Exception e){
                         fetched_text.setText(""+message);
