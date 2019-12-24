@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.FragmentActivity;
@@ -22,12 +23,13 @@ import com.google.android.gms.maps.model.Marker;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class FullMapViewActivity extends FragmentActivity implements OnMapReadyCallback {
+public class FullMapViewActivity extends BaseActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private AtsSocket atsSocket ;
     private String listening_key = "";
     private ImageView socket_connection_state ;
+    private TextView listening_to_text  ;
     private Marker marker = null;
     private AtsSocket.OnAtsSocketListener mListener = new AtsSocket.OnAtsSocketListener() {
         @Override
@@ -59,6 +61,7 @@ public class FullMapViewActivity extends FragmentActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_map_view);
+        listening_to_text  = findViewById(R.id.listening_to_text);
         socket_connection_state = findViewById(R.id.socket_connection_state);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -67,6 +70,7 @@ public class FullMapViewActivity extends FragmentActivity implements OnMapReadyC
 
         try{
             listening_key = getIntent().getExtras().getString("LISTENING_KEY");
+            listening_to_text.setText("Listening to UUID: "+listening_key);
             changeSocketConnectionColor(AtsApplication.isSocketConnected());
 
         }catch (Exception e){

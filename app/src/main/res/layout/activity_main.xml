@@ -616,7 +616,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/fetched_text"
-                    android:textSize="12dp"
+                    android:textSize="10dp"
                     android:textColor="#333333"
                     android:gravity="center|left"
                     android:text=" - - - - - - - - - -"/>
