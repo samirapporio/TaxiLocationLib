@@ -240,7 +240,7 @@ public abstract class AtsApplication extends Application  implements Application
         atsApiSynchroniesr.syncLogsAccordingly();
     }
 
-    private static boolean isServiceRunning() {
+    public static boolean isServiceRunning() {
 
         ActivityManager manager = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);
 
@@ -280,18 +280,19 @@ public abstract class AtsApplication extends Application  implements Application
     @SuppressLint("LongLogTag")
     public static void syncPhoneState() throws  Exception{
 
-        Log.d(""+TAG,"----> "+gson.toJson(getListofRunningServices()));
-
-        JSONObject app_state_jsno = new JSONObject();
-        app_state_jsno.put("location_service_running",isServiceRunning());
-        app_state_jsno.put("running_services", gson.toJson(getListofRunningServices()) );
-        app_state_jsno.put("foreground",app_foreground);
+//        Log.d(""+TAG,"----> "+gson.toJson(getListofRunningServices()));
+//
+//        JSONObject app_state_jsno = new JSONObject();
+//        app_state_jsno.put("location_service_running",isServiceRunning());
+//        app_state_jsno.put("running_services", gson.toJson(getListofRunningServices()) );
+//        app_state_jsno.put("foreground",app_foreground);
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("unique_no",""+Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID));
-        jsonObject.put("package_name",mContext.getApplicationContext().getPackageName());
-        jsonObject.put("permissions",AppInfoManager.getPermissionWithStatus());
-        jsonObject.put("app_state",app_state_jsno);
+//        jsonObject.put("unique_no",""+Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID));
+//        jsonObject.put("package_name",mContext.getApplicationContext().getPackageName());
+//        jsonObject.put("permissions",AppInfoManager.getPermissionWithStatus());
+        jsonObject.put("app_state",AppInfoManager.getAppStatusEncode());
+
 
         atsApiSynchroniesr.syncPhoneState(jsonObject);
     }
@@ -315,6 +316,12 @@ public abstract class AtsApplication extends Application  implements Application
 //            Toast.makeText(activity, "Enters in foreground | Pending logs:"+HyperLog.hasPendingDeviceLogs()+" | Log count:"+HyperLog.getDeviceLogsCount(), Toast.LENGTH_LONG).show();
             Log.d(TAG , "Enters in foreground");
             app_foreground = true ;
+            try{
+                atsApiSynchroniesr.syncPhoneState(new JSONObject().put("app_state", AppInfoManager.getAppStatusEncode()));
+            }catch (Exception e){
+                Toast.makeText(activity, "Exception while extracting app state: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 
@@ -333,6 +340,10 @@ public abstract class AtsApplication extends Application  implements Application
             }}
             else{Log.i(TAG , "On minimise logs is not synced");}
         }
+    }
+
+    public static boolean isAppInForegorund(){
+        return app_foreground ;
     }
 
     @Override

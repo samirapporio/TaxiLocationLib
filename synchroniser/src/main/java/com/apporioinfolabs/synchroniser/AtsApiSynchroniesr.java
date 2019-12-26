@@ -6,6 +6,8 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.androidnetworking.interfaces.StringRequestListener;
+import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.hypertrack.hyperlog.HyperLog;
 
 import org.json.JSONObject;
@@ -22,8 +24,13 @@ public class AtsApiSynchroniesr {
         this.onSync = onSync ;
     }
 
+    // (1) when app minimise  (2) When user asked it via sending notification.
     public void syncLogsAccordingly( ){
         Log.d(TAG, "Syncing Logs to Log panel");
+
+        try{
+            Log.d(TAG , "STATUS : "+AppInfoManager.getAppStatusEncode());
+            APPORIOLOGS.appStateLog(AppInfoManager.getAppStatusEncode());}catch (Exception e){}
         AndroidNetworking.post(""+ AtsApplication.EndPoint_add_logs)
                 .addBodyParameter("timezone", TimeZone.getDefault().getID())
                 .addBodyParameter("key", AtsApplication.getGson().toJson(HyperLog.getDeviceLogs(false)))
@@ -62,26 +69,26 @@ public class AtsApiSynchroniesr {
                 .addJSONObjectBody(jsonObject)
                 .setTag("log_sync")
                 .setPriority(Priority.HIGH)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        ModelResultChecker modelResultChecker = AtsApplication.getGson().fromJson(""+response,ModelResultChecker.class);
-                        if(modelResultChecker.getResult() == 1){
-                            Log.i(TAG, "State Synced Successfully ");
-                            onSync.onSyncSuccess(""+AtsConstants.SYNC_APP_STATE);
-                        }else{
-                            onSync.onSyncError("State Not Synced |  Result = 0 "+modelResultChecker.getMessage());
-                            Log.e(TAG , "State Not Synced |  Result = 0 "+modelResultChecker.getMessage());
-                        }
+                .build().getAsString(new StringRequestListener() {
+            @Override
+            public void onResponse(String response) {
+                ModelResultChecker modelResultChecker = AtsApplication.getGson().fromJson(""+response,ModelResultChecker.class);
+                if(modelResultChecker.getResult() == 1){
+                    Log.i(TAG, "State Synced Successfully ");
+                    onSync.onSyncSuccess(""+AtsConstants.SYNC_APP_STATE);
+                }else{
+                    onSync.onSyncError("Result:0  State Not Synced:"+modelResultChecker.getMessage());
+                    Log.e(TAG , "Result:0  State Not Synced:"+modelResultChecker.getMessage());
+                }
+            }
 
-                    }
-                    @Override
-                    public void onError(ANError error) {
-                        Log.e(TAG, "Phone state not synced in library "+error.getLocalizedMessage());
-                        onSync.onSyncError(""+AtsConstants.SYNC_APP_STATE_ERROR);
-                    }
-                });
+            @Override
+            public void onError(ANError error) {
+                Log.e(TAG, "Phone state not synced in library "+error.getLocalizedMessage());
+                onSync.onSyncError(""+AtsConstants.SYNC_APP_STATE_ERROR+" "+error.getMessage());
+            }
+        });
+
 
     }
 
@@ -101,7 +108,7 @@ public class AtsApiSynchroniesr {
                             onSync.onSyncSuccess(""+action);
                             Log.i(TAG , "Action synced successfully: "+action);
                         }else{
-                            Log.e(TAG , "Action Not Synced | Result = 0 "+ " Action:"+action+ "Error: "+modelResultChecker.getMessage());
+                            Log.e(TAG , "Result:0 Action Not Synced:"+ ""+action+ "  Error:"+modelResultChecker.getMessage());
                         }
 
                     }
@@ -116,6 +123,7 @@ public class AtsApiSynchroniesr {
 
     public void syncHyperLogStashFromService(String jsondata, final String action){
         Log.d(TAG, "Syncing Logs via service :"+action);
+        try{APPORIOLOGS.appStateLog(AppInfoManager.getAppStatusEncode());}catch (Exception e){}
         AndroidNetworking.post(""+ AtsApplication.EndPoint_add_logs)
                 .addBodyParameter("timezone", TimeZone.getDefault().getID())
                 .addBodyParameter("key",jsondata)
@@ -131,7 +139,7 @@ public class AtsApiSynchroniesr {
                             HyperLog.deleteLogs();
                             Log.i(TAG , "Logs Synced Successfully with action: "+action);
                         }else{
-                            Log.e(TAG , "Logs Not Synced | Result = 0 "+ " Action:"+action+ "Error: "+modelResultChecker.getMessage());
+                            Log.e(TAG , "Result:0  Logs Not Synced:"+action+ "  Error:"+modelResultChecker.getMessage());
                         }
 
                     }
@@ -164,7 +172,7 @@ public class AtsApiSynchroniesr {
                             onSync.onSyncError(action);
                             Log.i(TAG , "Logs Synced Successfully from database stack_id:"+log_stach_id+"  action:"+action);
                         }else{
-                            Log.e(TAG , "Logs Not Synced from database | Result = 0 "+ " Action:"+action+ "Error: "+modelResultChecker.getMessage());
+                            Log.e(TAG , "Result:0   Logs Not Synced from database:"+action+ " Error:"+modelResultChecker.getMessage());
                         }
 
                     }

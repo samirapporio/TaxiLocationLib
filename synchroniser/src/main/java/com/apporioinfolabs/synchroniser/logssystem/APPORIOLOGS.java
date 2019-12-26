@@ -46,6 +46,12 @@ public class APPORIOLOGS {
         emitLogs("EXTRA_DATA", ""+extra_data, "EXTRA_DATA");
     }
 
+    public static void appStateLog (String app_State){
+        HyperLog.i("APP_STATE",""+app_State);
+        emitLogs("APP_STATE", ""+app_State, "APP_STATE");
+    }
+
+
     public static void assertLog (String tag , String message){
         HyperLog.a(tag +" --> "+message);
         emitLogs(tag, message, "ASSERT");

@@ -93,7 +93,7 @@ public class MainApplication extends AtsApplication {
 
     @Override
     public String dataSyncedError(String s) {
-        Toast.makeText(this, "Error in syncing data by library", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Error: "+s, Toast.LENGTH_SHORT).show();
         return s;
     }
 

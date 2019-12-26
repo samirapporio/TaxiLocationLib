@@ -8,17 +8,14 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
 import android.util.Log;
-
 import com.apporioinfolabs.synchroniser.db.OfflineLogModel;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.google.gson.Gson;
 import com.hypertrack.hyperlog.HyperLog;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +80,7 @@ public abstract  class AtsLocationService extends Service  {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(AtsLocationEvent event) {
 
+
         try{ atsNotification.updateNotificationView(event); }
         catch (Exception e){ Log.e(TAG , ""+e.getMessage()); }
 
@@ -112,8 +110,12 @@ public abstract  class AtsLocationService extends Service  {
 
         if(HyperLog.getDeviceLogsCount() >= 25){
             if(AtsApplication.autoLogSynchronization){
-                try{ AtsApplication.syncHyperLogsStach(gson.toJson(HyperLog.getDeviceLogs(false))); }
-                catch (Exception e){ Log.e(TAG, "Exception while syncing: "+e.getMessage()); }
+                try{
+                    AtsApplication.syncHyperLogsStach(gson.toJson(HyperLog.getDeviceLogs(false)));
+                }
+                catch (Exception e){
+                    Log.e(TAG, "Exception while syncing: "+e.getMessage());
+                }
             }else{
                 HyperLog.deleteLogs();
                 Log.i(TAG, "Logs Ignored from sync as auto sync mode is off, also hyper og stack is clear");

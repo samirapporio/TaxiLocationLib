@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.apporioinfolabs.synchroniser.AppInfoManager;
 import com.apporioinfolabs.synchroniser.ApporioTrackingSystem;
 import com.apporioinfolabs.synchroniser.AtsApplication;
 import com.apporioinfolabs.synchroniser.AtsEventBus;
@@ -36,7 +37,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

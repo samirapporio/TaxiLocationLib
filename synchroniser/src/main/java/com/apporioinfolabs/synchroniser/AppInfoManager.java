@@ -3,6 +3,8 @@ package com.apporioinfolabs.synchroniser;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.provider.Settings;
+import android.util.Log;
 
 
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
@@ -73,6 +75,56 @@ public class AppInfoManager {
             APPORIOLOGS.warningLog(TAG , ""+e.getMessage());
         }
         return permissionsarray ;
+
+
+    }
+
+    private static String isLocationPermissionCode() throws Exception{
+        String value = "lf";
+        String packagename = AtsApplication.mContext.getApplicationContext().getPackageName();
+        PackageInfo packageInfo = AtsApplication.mContext.getPackageManager().getPackageInfo(packagename,PackageManager.GET_PERMISSIONS);
+
+        for(int i =0 ; i < packageInfo.requestedPermissions.length ; i++){
+            if(packageInfo.requestedPermissions[i].equals("android.permission.ACCESS_FINE_LOCATION") && hasPermission("android.permission.ACCESS_FINE_LOCATION")){
+                value = "lt" ;
+            }
+        }
+
+        return value;
+    }
+
+    private static String isAppInForegroundCode(){
+        if(AtsApplication.isAppInForegorund()){
+            return "fore";
+        }else{
+            return "back";
+        }
+    }
+
+
+
+
+    //   services names array
+
+    //   package name
+    //   device uuid
+    //   permission-> location, read and write, camera, audio,
+    //   foreground or background
+
+    //   com.apporio.apporiotaxilocationlib_udid_lt_f_classone_classnametwo_classnamingthree_classnamingotherexamplefour
+
+
+
+    public static String getAppStatusEncode() throws Exception{
+
+        String value = ""
+                + AtsApplication.mContext.getApplicationContext().getPackageName() +"_"
+                + Settings.Secure.getString(AtsApplication.mContext.getContentResolver(), Settings.Secure.ANDROID_ID)+"_"
+                + isLocationPermissionCode()+"_"
+                + isAppInForegroundCode()+"_"
+                + AtsApplication.getListofRunningServices();
+
+        return ""+value;
     }
 
 
