@@ -85,6 +85,16 @@ public class MainApplication extends AtsApplication {
     }
 
     @Override
+    public boolean allowLocationToEmitOnSocket() {
+        return true;
+    }
+
+    @Override
+    public boolean allowAppStateSyncOnSocket() {
+        return true;
+    }
+
+    @Override
     public String dataSynced(String action) {
         Toast.makeText(this, "Synced Action: "+action, Toast.LENGTH_SHORT).show();
         try{sendNotificationToTargetDebuggingDevice(targetPlayerIdNotification,action);}catch (Exception e){}

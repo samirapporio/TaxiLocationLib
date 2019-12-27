@@ -2,6 +2,14 @@ apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        release_config {
+            storeFile file('/Android Apps/TaxiLocationLib/credentials/123456')
+            storePassword '123456'
+            keyAlias = 'apporio'
+            keyPassword '123456'
+        }
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
     defaultConfig {
@@ -14,14 +22,15 @@ android {
         applicationId "com.apporioinfolabs.taxilocationlib"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release_config
         }
     }
 }

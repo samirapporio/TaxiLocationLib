@@ -10,11 +10,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.apporioinfolabs.synchroniser.db.SqliteDBHelper;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
@@ -52,6 +55,8 @@ public abstract class AtsApplication extends Application  implements Application
     public static boolean logSyncOnAppMinimize = true ;
     public static boolean isSocketConnection_allowed = true ;
     public static boolean isLiveLogsAllowed = true ;
+    public static boolean isSyncLocationOnSocket = false;
+    public static boolean isSyncAppStateOnSocket = false ;
     public static JSONObject onConnectionObject ;
     public static String UNIQUE_NO  = "";
     public static boolean IS_SOCKET_CONNECTED = false ;
@@ -111,6 +116,8 @@ public abstract class AtsApplication extends Application  implements Application
         logSyncOnAppMinimize = setLogSyncOnAppMinimize();
         isSocketConnection_allowed = setSocketConnection();
         isLiveLogsAllowed = allowLiveLogs();
+        isSyncLocationOnSocket = allowLocationToEmitOnSocket() ;
+        isSyncAppStateOnSocket = allowAppStateSyncOnSocket();
 
         if(isSocketConnection_allowed){
             try{ connectToSocketServer(); }
@@ -176,6 +183,8 @@ public abstract class AtsApplication extends Application  implements Application
     public abstract boolean setLogSyncOnAppMinimize ();
     public abstract boolean setSocketConnection();
     public abstract boolean allowLiveLogs();
+    public abstract boolean allowLocationToEmitOnSocket();
+    public abstract boolean allowAppStateSyncOnSocket();
 
 
 
@@ -318,6 +327,7 @@ public abstract class AtsApplication extends Application  implements Application
             app_foreground = true ;
             try{
                 atsApiSynchroniesr.syncPhoneState(new JSONObject().put("app_state", AppInfoManager.getAppStatusEncode()));
+                SocketListeners.emitAppState();
             }catch (Exception e){
                 Toast.makeText(activity, "Exception while extracting app state: "+e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -332,7 +342,6 @@ public abstract class AtsApplication extends Application  implements Application
         if (--activityReferences == 0 && !isActivityChangingConfigurations) {
             app_foreground = false ;
             removePreviousListeners();
-
             if(logSyncOnAppMinimize){
                 Log.i(TAG , "Syncing logs on minimise");
                 try{syncLogsAccordingly();}catch (Exception e){
@@ -368,8 +377,28 @@ public abstract class AtsApplication extends Application  implements Application
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-
+        Log.i(TAG +"APP_STATE", "Activity destroyed");
     }
+
+    @Override
+    public void onTerminate() {
+        Log.i(TAG +"APP_STATE", "App is terminated");
+        super.onTerminate();
+    }
+
+    @Override
+    public void onLowMemory() {
+        Log.i(TAG +"APP_STATE", "App is on low memory");
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        Log.i(TAG +"APP_STATE", "On app configuration changed");
+        super.onConfigurationChanged(newConfig);
+    }
+
+
 
     @Override
     public void onSyncSuccess(String action) {

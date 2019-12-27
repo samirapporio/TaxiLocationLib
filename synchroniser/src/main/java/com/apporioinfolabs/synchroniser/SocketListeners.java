@@ -18,6 +18,7 @@ public class SocketListeners {
     public static final String REQUEST_LISTENER = "request_listener" ;
     public static final String REMOVE_LISTENER = "remove_listener" ;
     public static final String LIVE_LOG = "live_log" ;
+    public static final String APP_STATE = "app_state" ;
 
 
 
@@ -32,6 +33,7 @@ public class SocketListeners {
                     @Override
                     public void call(Object... args) {
                         APPORIOLOGS.informativeLog(TAG, " - - "+ args[0]);
+                        emitAppState();
                     }
                 });
             }
@@ -53,12 +55,15 @@ public class SocketListeners {
 
     public static void emitLocation(JSONObject location){
         if(AtsApplication.isSocketConnection_allowed){
-            AtsApplication.getSocket().emit(DEVICE_LOCATION, location, new Ack() {
-                @Override
-                public void call(Object... args) {
-                    Log.i(TAG, " - - "+ args[0]);
-                }
-            });
+            if(AtsApplication.isSocketConnected() && AtsApplication.isSyncLocationOnSocket){
+                AtsApplication.getSocket().emit(DEVICE_LOCATION, location, new Ack() {
+                    @Override
+                    public void call(Object... args) {
+                        Log.i(TAG, " - - "+ args[0]);
+                    }
+                });
+            }
+
         }
     }
 
@@ -79,14 +84,37 @@ public class SocketListeners {
 
 
     public static void emitLog(String log){
-        if(AtsApplication.isSocketConnection_allowed && AtsApplication.isLiveLogsAllowed){
-            if(AtsApplication.getSocket().connected()){
+        if(AtsApplication.isSocketConnection_allowed ){
+            if(AtsApplication.getSocket().connected() && AtsApplication.isLiveLogsAllowed ){
                 AtsApplication.getSocket().emit(LIVE_LOG, log, new Ack() {
                     @Override
                     public void call(Object... args) {
                         Log.i(TAG, " - - "+ args[0]);
                     }
                 });
+            }else{
+                Log.d(TAG, "Socket is not connected for emitting live logs. ");
+            }
+        }else{
+            Log.i(TAG , "Either Socket Connection or live logs are not allowed. ");
+        }
+    }
+
+    public static void emitAppState(){
+        if(AtsApplication.isSocketConnection_allowed ){
+            if(AtsApplication.getSocket().connected() && AtsApplication.isSyncAppStateOnSocket ){
+
+                try{
+                    String state_to_sync = AppInfoManager.getAppStatusEncode();
+                    AtsApplication.getSocket().emit(APP_STATE, state_to_sync, new Ack() {
+                        @Override
+                        public void call(Object... args) {
+                            Log.i(TAG, " - - "+ args[0]);
+                        }
+                    });
+                }catch (Exception e){
+                    Log.e(TAG , "Unable to get app state "+e.getMessage());
+                }
             }else{
                 Log.d(TAG, "Socket is not connected for emitting live logs. ");
             }
