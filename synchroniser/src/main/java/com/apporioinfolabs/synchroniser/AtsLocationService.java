@@ -80,6 +80,7 @@ public abstract  class AtsLocationService extends Service  {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(AtsLocationEvent event) {
 
+        APPORIOLOGS.informativeLog(TAG , "LAT:"+event.pojolocation.getLatitude()+", LONG:"+event.pojolocation.getLongitude());
 
         try{ atsNotification.updateNotificationView(event); }
         catch (Exception e){ Log.e(TAG , ""+e.getMessage()); }
