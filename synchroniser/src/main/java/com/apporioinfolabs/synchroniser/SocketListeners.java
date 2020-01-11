@@ -28,6 +28,7 @@ public class SocketListeners {
             AtsApplication.IS_SOCKET_CONNECTED = true;
             Log.d(TAG, "Connected to socket server and emitting device info ");
             EventBus.getDefault().post(""+AtsEventBus.SOCKET_CONNECTED);
+            AtsApplication.atsSocketConnectionHandlers.atsServerConnectionState(true);
             if(AtsApplication.isSocketConnection_allowed){
                 AtsApplication.getSocket().emit(CONNECT_DEVICE, OnConnectionInfoManager.getDeviceAndApplicationInfo(), new Ack() {
                     @Override
@@ -48,6 +49,7 @@ public class SocketListeners {
             AtsApplication.IS_SOCKET_CONNECTED = false;
             Log.d(TAG , "Disconnected to socket server");
             EventBus.getDefault().post(""+AtsEventBus.SOCKET_DISCONNECTED);
+            AtsApplication.atsSocketConnectionHandlers.atsServerConnectionState(false);
         }
     };
 

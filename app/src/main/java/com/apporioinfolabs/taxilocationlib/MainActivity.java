@@ -26,7 +26,6 @@ import androidx.core.content.ContextCompat;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.apporioinfolabs.synchroniser.AppInfoManager;
 import com.apporioinfolabs.synchroniser.ApporioTrackingSystem;
 import com.apporioinfolabs.synchroniser.AtsApplication;
 import com.apporioinfolabs.synchroniser.AtsEventBus;
@@ -60,7 +59,6 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
     private Gson gson ;
     boolean SocketConnectionState = false  ;
     RequestQueue queue ;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,6 +193,9 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
             }
         });
 
+
+
+
         findViewById(R.id.connected_devices_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -290,7 +291,6 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
         changeSocketConnectionColor(atsEvent);
     };
 
-
     private void showAlertForSelection (){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -303,8 +303,6 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
                 }).create().show();
     }
 
-
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -313,7 +311,6 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
     private void setLogLevelTextAccordingToLevel(){
         log_level_text.setText(""+log_levels[selectedlogLevel]);
     }
-
 
     public void setMarkerandMapCamera(double latitude, double longitude){
         if(mMap != null){
@@ -332,7 +329,6 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
             startService(new Intent(this, UpdateServiceClass.class));
         }
     }
-
 
     private void listenToTheEnteredKey(){
         if(edt_listen_box.getText().toString().equals("")){

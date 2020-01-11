@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.apporioinfolabs.synchroniser.db.SqliteDBHelper;
+import com.apporioinfolabs.synchroniser.handlers.AtsSocketConnectionHandlers;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.apporioinfolabs.synchroniser.logssystem.CustomLogMessageFormat;
 import com.github.nkzawa.socketio.client.IO;
@@ -58,6 +59,7 @@ public abstract class AtsApplication extends Application  implements Application
     public static boolean isSyncLocationOnSocket = false;
     public static boolean isSyncAppStateOnSocket = false ;
     public static JSONObject onConnectionObject ;
+    public static AtsSocketConnectionHandlers atsSocketConnectionHandlers ;
     public static String UNIQUE_NO  = "";
     public static boolean IS_SOCKET_CONNECTED = false ;
     public static int BatteryLevel ;
@@ -118,6 +120,7 @@ public abstract class AtsApplication extends Application  implements Application
         isLiveLogsAllowed = allowLiveLogs();
         isSyncLocationOnSocket = allowLocationToEmitOnSocket() ;
         isSyncAppStateOnSocket = allowAppStateSyncOnSocket();
+        atsSocketConnectionHandlers = setAtsConnectionStateHandlers();
 
         if(isSocketConnection_allowed){
             try{ connectToSocketServer(); }
@@ -185,6 +188,7 @@ public abstract class AtsApplication extends Application  implements Application
     public abstract boolean allowLiveLogs();
     public abstract boolean allowLocationToEmitOnSocket();
     public abstract boolean allowAppStateSyncOnSocket();
+    public abstract AtsSocketConnectionHandlers setAtsConnectionStateHandlers();
 
 
 

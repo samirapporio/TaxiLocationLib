@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.widget.Toast;
 
 import com.apporioinfolabs.synchroniser.AtsApplication;
+import com.apporioinfolabs.synchroniser.handlers.AtsSocketConnectionHandlers;
 import com.onesignal.OneSignal;
 
 import org.json.JSONArray;
@@ -92,6 +93,11 @@ public class MainApplication extends AtsApplication {
     @Override
     public boolean allowAppStateSyncOnSocket() {
         return true;
+    }
+
+    @Override
+    public AtsSocketConnectionHandlers setAtsConnectionStateHandlers() {
+        return new AtsConnection();
     }
 
     @Override
