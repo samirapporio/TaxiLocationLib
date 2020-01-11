@@ -47,7 +47,7 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
 
     EditText editText , edt_listen_box , log_input_edt;
     TextView fetched_text , unique_no_text, device_fetch_text, log_level_text ;
-    ImageView  socket_connection_state , device_image ;
+    ImageView  device_image ;
     ProgressBar device_progress_fetch ;
     LinearLayout select_log_type_layout ;
     Switch autoSyncSwitch, liveLogsSwitch , synclogsonminimiseSwitch;
@@ -79,8 +79,6 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
         liveLogsSwitch = findViewById(R.id.liveLogsSwitch);
         synclogsonminimiseSwitch = findViewById(R.id.synclogsonminimiseSwitch);
 
-
-        socket_connection_state = findViewById(R.id.socket_connection_state);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
@@ -274,8 +272,6 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
     @Override
     protected void onResume() {
         super.onResume();
-        AtsEventBus.getDefault().register(this);
-        setConnectivityStatusView();
         listenToTheEnteredKey();
         checkLocationPermission();
     }
@@ -283,13 +279,8 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
     @Override
     protected void onPause() {
         super.onPause();
-        AtsEventBus.getDefault().unregister(this);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAtsMessage(String atsEvent) {
-        changeSocketConnectionColor(atsEvent);
-    };
 
     private void showAlertForSelection (){
 
@@ -362,21 +353,8 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
         }
     }
 
-    private void setConnectivityStatusView(){
-        if(AtsApplication.IS_SOCKET_CONNECTED){socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_connected_vector));}
-        else{ socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_disconnected_vector));}
 
-    }
 
-    private void changeSocketConnectionColor(String val){
-        if(val.equals(""+AtsEventBus.SOCKET_CONNECTED)){
-            SocketConnectionState = true ;
-            socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_connected_vector));
-        }else if(val.equals(""+AtsEventBus.SOCKET_DISCONNECTED)){
-            SocketConnectionState = false ;
-            socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_disconnected_vector));
-        }
-    }
 
     private void checkLocationPermission (){
         if ( ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

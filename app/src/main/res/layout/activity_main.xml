@@ -85,12 +85,9 @@
 
 
 
-        <ImageView
+        <com.apporioinfolabs.synchroniser.atscustomviews.AtsSocketConnectionView
             android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_socket_disconnected_vector"
-            android:padding="7dp"
-            android:id="@+id/socket_connection_state"/>
+            android:layout_height="40dp"/>
 
     </LinearLayout>
 
@@ -381,6 +378,8 @@
 
 
             </LinearLayout>
+
+
 
 
 
