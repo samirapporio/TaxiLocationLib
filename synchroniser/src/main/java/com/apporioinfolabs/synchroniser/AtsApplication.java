@@ -77,6 +77,7 @@ public abstract class AtsApplication extends Application  implements Application
     public static final String EndPoint_sync_App_State = "http://13.233.98.63:3108/api/v1/logs/sync_app_state";
 //    public static final String EndPoint_socket = "http://192.168.1.33:3005"; // development server Apporio Airtel_5Ghz
     public static final String EndPoint_socket = "http://13.233.98.63:3005";  // live server TBPO
+    public static final String EndPoint_set_trip = "http://13.233.98.63:3005/api/v1/sockets_api/set_trip_flag";  // live server TBPO
 
 
 
@@ -275,6 +276,11 @@ public abstract class AtsApplication extends Application  implements Application
         }else{
             return false;
         }
+    }
+
+    public static void setTrip(String flag, String tag, OnAtsTripSetterListeners onAtsTripSetterListeners)throws Exception{
+        Log.d(TAG, "Setting trip with flag:"+flag);
+        atsApiSynchroniesr.setTrip(flag, tag, onAtsTripSetterListeners);
     }
 
     public static List<String> getListofRunningServices(){

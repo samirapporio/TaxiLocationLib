@@ -154,7 +154,6 @@ public class AtsApiSynchroniesr {
 
     }
 
-
     public void syncAndDeleteLogsFromDatabse(String jsonData, final int log_stach_id, final String action){
         Log.d(TAG , "Syncing logs from database Stack");
         AndroidNetworking.post(""+ AtsApplication.EndPoint_add_logs)
@@ -183,6 +182,86 @@ public class AtsApiSynchroniesr {
                     }
                 });
 
+    }
+
+    public void setTrip(final String flag, final String tag, final OnAtsTripSetterListeners onAtsTripSetterListeners) throws Exception{
+
+        // first library will sync log for ensuring that all location is synced successfully
+        // after location sync it will update flag value then finally it will delete the existing tags
+
+
+        try{
+            Log.d(TAG , "STATUS : "+AppInfoManager.getAppStatusEncode());
+            APPORIOLOGS.appStateLog(AppInfoManager.getAppStatusEncode());}catch (Exception e){}
+        AndroidNetworking.post(""+ AtsApplication.EndPoint_add_logs)
+                .addBodyParameter("timezone", TimeZone.getDefault().getID())
+                .addBodyParameter("key", AtsApplication.getGson().toJson(HyperLog.getDeviceLogs(false)))
+                .setTag("log_sync")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try{
+                            ModelResultChecker modelResultChecker = AtsApplication.getGson().fromJson(""+response,ModelResultChecker.class);
+                            if(modelResultChecker.getResult() == 1 ){
+                                Log.i(TAG, "Logs Synced Successfully while setting trip.");
+                                startSettingFlagNow(flag, tag, onAtsTripSetterListeners);
+                            }else{
+                                Log.e(TAG, "Logs Not synced from server while setting trip got message "+modelResultChecker.getMessage());
+                                onSync.onSyncError(""+AtsConstants.SYNC_EXISTING_LOGS_ERROR);
+                                onAtsTripSetterListeners.onTripSetFail("Logs Not synced from server while setting trip got message "+modelResultChecker.getMessage());
+                            }
+                        }catch (Exception e){
+                            Log.e(TAG, "Logs Not synced with error code: "+e.getMessage());
+                            onAtsTripSetterListeners.onTripSetFail("Logs Not synced while setting trip with error code: "+e.getMessage());
+                        }
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        Log.e(TAG, "Logs Not synced with error code: "+error.getErrorCode());
+                        onSync.onSyncError(""+AtsConstants.SYNC_EXISTING_LOGS_ERROR);
+                    }
+                });
+
+    }
+
+
+    private void startSettingFlagNow(String flag, String tag, final OnAtsTripSetterListeners onAtsTripSetterListeners) throws Exception{
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("flag",""+flag);
+        jsonObject.put("device",""+AtsApplication.UNIQUE_NO);
+        jsonObject.put("package_name",""+AppInfoManager.getPackageName());
+        jsonObject.put("tag",""+tag);
+
+
+        Log.d(TAG, "Setting trip with flag:"+flag);
+        AndroidNetworking.post(""+ AtsApplication.EndPoint_set_trip)
+                .addJSONObjectBody(jsonObject)
+                .setTag("log_sync")
+                .setPriority(Priority.HIGH)
+                .build().getAsString(new StringRequestListener() {
+            @Override
+            public void onResponse(String response) {
+                ModelResultChecker modelResultChecker = AtsApplication.getGson().fromJson(""+response,ModelResultChecker.class);
+                if(modelResultChecker.getResult() == 1){
+                    Log.i(TAG, "Trip Flag set Successfully ");
+                    onAtsTripSetterListeners.onTripSetSuccess("Trip Flag set Successfully ");
+
+                }else{
+                    onAtsTripSetterListeners.onTripSetFail("Result:0  Unable to set trip flag:"+modelResultChecker.getMessage());
+                    Log.e(TAG , "Result:0  State Not Synced:"+modelResultChecker.getMessage());
+                }
+            }
+
+            @Override
+            public void onError(ANError error) {
+                Log.e(TAG, "Trip state not set in library: "+error.getLocalizedMessage());
+                onAtsTripSetterListeners.onTripSetFail("Trip state not set in library: "+error.getLocalizedMessage());
+            }
+        });
+        HyperLog.deleteLogs();
     }
 
     public interface OnSync{

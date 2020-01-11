@@ -28,7 +28,7 @@ public class FullMapViewActivity extends BaseActivity implements OnMapReadyCallb
     private GoogleMap mMap;
     private AtsSocket atsSocket ;
     private String listening_key = "";
-    private ImageView socket_connection_state ;
+
     private TextView listening_to_text  ;
     private Marker marker = null;
     private AtsSocket.OnAtsSocketListener mListener = new AtsSocket.OnAtsSocketListener() {
@@ -62,7 +62,7 @@ public class FullMapViewActivity extends BaseActivity implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_map_view);
         listening_to_text  = findViewById(R.id.listening_to_text);
-        socket_connection_state = findViewById(R.id.socket_connection_state);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -71,7 +71,6 @@ public class FullMapViewActivity extends BaseActivity implements OnMapReadyCallb
         try{
             listening_key = getIntent().getExtras().getString("LISTENING_KEY");
             listening_to_text.setText("Listening to UUID: "+listening_key);
-            changeSocketConnectionColor(AtsApplication.isSocketConnected());
 
         }catch (Exception e){
 
@@ -87,54 +86,8 @@ public class FullMapViewActivity extends BaseActivity implements OnMapReadyCallb
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        AtsEventBus.getDefault().register(this);
-        if(listening_key.equals("")){
-            Toast.makeText(this, "Found No Key To Listen", Toast.LENGTH_SHORT).show();
-        }else{
-            atsSocket.startListen(""+listening_key, mListener);
 
-        }
-    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        AtsEventBus.getDefault().unregister(this);
-        if(listening_key.equals("")){
-            Toast.makeText(this, "Unable to remove socket listener as no key found in activity", Toast.LENGTH_SHORT).show();
-        }else{
-            atsSocket.stopListen("" +listening_key, new AtsSocket.OnAtsSocketListener() {
-                @Override
-                public void onMessageReceived(String message) {
-                    Toast.makeText(FullMapViewActivity.this, ""+message, Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onSuccessRegistrataion(String message) {
-                    Toast.makeText(FullMapViewActivity.this, ""+message, Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onFailureRegistration(String message) {
-                    Toast.makeText(FullMapViewActivity.this, ""+message, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAtsConnectionMessage(String atsEvent) {
-        if(atsEvent.equals(""+AtsEventBus.SOCKET_CONNECTED)){
-            changeSocketConnectionColor(true);
-        }else if(atsEvent.equals(""+AtsEventBus.SOCKET_DISCONNECTED)){
-            changeSocketConnectionColor(false);
-        }
-
-    };
 
 
     @Override
@@ -146,13 +99,7 @@ public class FullMapViewActivity extends BaseActivity implements OnMapReadyCallb
     }
 
 
-    private void changeSocketConnectionColor(boolean value){
-        if(value){
-            socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_connected_vector));
-        }else {
-            socket_connection_state.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_socket_disconnected_vector));
-        }
-    }
+
 
 
     public void setMarkerandMapCamera(double latitude, double longitude){

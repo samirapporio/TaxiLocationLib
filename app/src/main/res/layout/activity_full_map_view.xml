@@ -32,7 +32,7 @@
 
 
         <LinearLayout
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:orientation="vertical"
@@ -47,13 +47,11 @@
                 android:id="@+id/listening_to_text"/>
         </LinearLayout>
 
+        <com.apporioinfolabs.synchroniser.atscustomviews.AtsSocketConnectionView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/ic_socket_disconnected_vector"
-            android:padding="10dp"
-            android:id="@+id/socket_connection_state"/>
+
 
     </LinearLayout>
 
