@@ -1,16 +1,28 @@
-# TaxiLocationLib
-Effective location service implementation in any android app and live logs for debugging you app
+# ATS (Apporio Tracking System)
 
-## About TaxiLocation Lib
+[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
 
-This library is specificly made for Three main functionality 
+Ats is a universal solution for the developer that is a basic need of creating taxi like application. This SDK covers three main section as follows
 
-(1) Location service
-
-(2) Logs saving
-
-(3) Live Socket (Live logs i.e. remote debugging and Live location tracking)
-
+  - ###### Handling location service
+  - ###### Log Management ( live remote debugging and Log Collector  )
+  - ###### Live Tracking and data sharing over sockets (Ats-Sockets)      
+  
+ 
 
 
-You can find out the sample app [here](https://play.google.com/store/apps/details?id=com.apporioinfolabs.taxilocationlib&hl=en_IN)
+### Implementation in Android
+In your project level gradle add jitpack server for the implementation of sdk 
+```sh
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+
+In app level gradle add the implementation 
+```sh
+		implementation 'com.github.User:Repo:1.0.5'
+```
