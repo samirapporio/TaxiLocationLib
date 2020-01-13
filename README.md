@@ -22,5 +22,5 @@ allprojects {
 
 In app level gradle add the implementation 
 ```sh
-implementation 'com.github.samirapporio:TaxiLocationLib:Tag'
+implementation 'com.github.samirapporio:TaxiLocationLib:1.1.5'
 ```
