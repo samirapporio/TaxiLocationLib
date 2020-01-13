@@ -16,9 +16,8 @@ In your project level gradle add jitpack server for the implementation of sdk
 ```sh
 allprojects {
 	repositories {
-	...
-		maven { url 'https://jitpack.io' }
-		}
+	maven { url 'https://jitpack.io' }
+	}
 }
 ```
 
