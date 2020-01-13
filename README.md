@@ -1,7 +1,6 @@
-# ATS (Apporio Tracking System)
-
 [![N|Solid](https://www.apporio.com/wp-content/uploads/2018/03/logo-1.png)](https://www.apporio.com/)
 
+# ATS (Apporio Tracking System)
 Ats is a universal solution for the developer that is a basic need of creating taxi like application. This SDK covers three main section as follows
 
   - ###### Handling location service
