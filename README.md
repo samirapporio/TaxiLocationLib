@@ -15,14 +15,14 @@ Ats is a universal solution for the developer that is a basic need of creating t
 In your project level gradle add jitpack server for the implementation of sdk 
 ```sh
 allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
+	repositories {
+	...
+		maven { url 'https://jitpack.io' }
 		}
-	}
+}
 ```
 
 In app level gradle add the implementation 
 ```sh
-		implementation 'com.github.User:Repo:1.0.5'
+implementation 'com.github.samirapporio:TaxiLocationLib:Tag'
 ```
