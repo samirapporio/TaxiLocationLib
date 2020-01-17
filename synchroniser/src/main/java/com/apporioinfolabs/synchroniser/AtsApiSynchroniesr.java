@@ -184,7 +184,7 @@ public class AtsApiSynchroniesr {
 
     }
 
-    public void setTrip(final String flag, final String tag, final OnAtsTripSetterListeners onAtsTripSetterListeners) throws Exception{
+    public void setTrip(final String flag, final String tag, final String locationSubmissionURL, final OnAtsTripSetterListeners onAtsTripSetterListeners) throws Exception{
 
         // first library will sync log for ensuring that all location is synced successfully
         // after location sync it will update flag value then finally it will delete the existing tags
@@ -206,7 +206,7 @@ public class AtsApiSynchroniesr {
                             ModelResultChecker modelResultChecker = AtsApplication.getGson().fromJson(""+response,ModelResultChecker.class);
                             if(modelResultChecker.getResult() == 1 ){
                                 Log.i(TAG, "Logs Synced Successfully while setting trip.");
-                                startSettingFlagNow(flag, tag, onAtsTripSetterListeners);
+                                startSettingFlagNow(flag, tag, locationSubmissionURL,  onAtsTripSetterListeners);
                             }else{
                                 Log.e(TAG, "Logs Not synced from server while setting trip got message "+modelResultChecker.getMessage());
                                 onSync.onSyncError(""+AtsConstants.SYNC_EXISTING_LOGS_ERROR);
@@ -227,12 +227,13 @@ public class AtsApiSynchroniesr {
     }
 
 
-    private void startSettingFlagNow(String flag, String tag, final OnAtsTripSetterListeners onAtsTripSetterListeners) throws Exception{
+    private void startSettingFlagNow(String flag, String tag, String locationSubmissionURL, final OnAtsTripSetterListeners onAtsTripSetterListeners) throws Exception{
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("flag",""+flag);
         jsonObject.put("device",""+AtsApplication.UNIQUE_NO);
         jsonObject.put("package_name",""+AppInfoManager.getPackageName());
+        jsonObject.put("location_submission_url",""+locationSubmissionURL);
         jsonObject.put("tag",""+tag);
 
 

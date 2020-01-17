@@ -10,9 +10,6 @@ public class ApporioTrackingSystem {
         return AtsApplication.isLiveLogsAllowed;
     }
 
-    public static boolean isSocketConnectionAllowed(){
-        return AtsApplication.isSocketConnection_allowed ;
-    }
 
     public static boolean isLogsSyncOnAppMinimise(){
         return AtsApplication.logSyncOnAppMinimize ;

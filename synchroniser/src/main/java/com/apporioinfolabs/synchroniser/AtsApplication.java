@@ -54,12 +54,11 @@ public abstract class AtsApplication extends Application  implements Application
     public static boolean setIntervalRunningWhenVehicleStops = true ;
     public static boolean autoLogSynchronization = false ;
     public static boolean logSyncOnAppMinimize = true ;
-    public static boolean isSocketConnection_allowed = true ;
     public static boolean isLiveLogsAllowed = true ;
     public static boolean isSyncLocationOnSocket = false;
-    public static boolean isSyncAppStateOnSocket = false ;
     public static JSONObject onConnectionObject ;
     public static AtsSocketConnectionHandlers atsSocketConnectionHandlers ;
+    public static String TOKEN = "NA";
     public static String UNIQUE_NO  = "";
     public static boolean IS_SOCKET_CONNECTED = false ;
     public static int BatteryLevel ;
@@ -117,18 +116,13 @@ public abstract class AtsApplication extends Application  implements Application
         setIntervalRunningWhenVehicleStops = setIntervalRunningOnVehicleStop();
         autoLogSynchronization = setAutoLogSynchronization();
         logSyncOnAppMinimize = setLogSyncOnAppMinimize();
-        isSocketConnection_allowed = setSocketConnection();
         isLiveLogsAllowed = allowLiveLogs();
         isSyncLocationOnSocket = allowLocationToEmitOnSocket() ;
-        isSyncAppStateOnSocket = allowAppStateSyncOnSocket();
         atsSocketConnectionHandlers = setAtsConnectionStateHandlers();
+        TOKEN = setTokenForConnection();
 
-        if(isSocketConnection_allowed){
-            try{ connectToSocketServer(); }
-            catch (Exception e){ Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show(); }
-        }else{
-            Log.e(TAG , "Socket Connection Strict to connect by developer");
-        }
+        try{ connectToSocketServer(); }
+        catch (Exception e){ Toast.makeText(mContext, ""+e.getMessage(), Toast.LENGTH_SHORT).show(); }
 
 
 
@@ -185,11 +179,10 @@ public abstract class AtsApplication extends Application  implements Application
     public abstract String dataSyncedError(String error);
     public abstract boolean setAutoLogSynchronization ();
     public abstract boolean setLogSyncOnAppMinimize ();
-    public abstract boolean setSocketConnection();
     public abstract boolean allowLiveLogs();
     public abstract boolean allowLocationToEmitOnSocket();
-    public abstract boolean allowAppStateSyncOnSocket();
     public abstract AtsSocketConnectionHandlers setAtsConnectionStateHandlers();
+    public abstract String setTokenForConnection();
 
 
 
@@ -207,10 +200,8 @@ public abstract class AtsApplication extends Application  implements Application
     }
 
     public static void removePreviousListeners(){
-        if(isSocketConnection_allowed){
-            mSocket.off();
-            reConnectToBasicRequiredListeners();
-        }
+        mSocket.off();
+        reConnectToBasicRequiredListeners();
     }
 
     public static void setPlayerId(String data){
@@ -267,20 +258,21 @@ public abstract class AtsApplication extends Application  implements Application
     }
 
     public static boolean isSocketConnected(){
-        if(isSocketConnection_allowed){
-            if(mSocket.connected()){
-                return true ;
-            }else{
-                return false;
-            }
+        if(mSocket.connected()){
+            return true ;
         }else{
             return false;
         }
     }
 
-    public static void setTrip(String flag, String tag, OnAtsTripSetterListeners onAtsTripSetterListeners)throws Exception{
+    public static void startTrip(String flag, String tag,String locationSubmissionUrl, OnAtsTripSetterListeners onAtsTripSetterListeners)throws Exception{
         Log.d(TAG, "Setting trip with flag:"+flag);
-        atsApiSynchroniesr.setTrip(flag, tag, onAtsTripSetterListeners);
+        atsApiSynchroniesr.setTrip(flag, tag, locationSubmissionUrl, onAtsTripSetterListeners);
+    }
+
+    public static void endTrip(String flag, String tag,String locationSubmissionUrl, OnAtsTripSetterListeners onAtsTripSetterListeners)throws Exception{
+        Log.d(TAG, "Setting trip with flag:"+flag);
+        atsApiSynchroniesr.setTrip(flag, tag, locationSubmissionUrl,  onAtsTripSetterListeners);
     }
 
     public static List<String> getListofRunningServices(){

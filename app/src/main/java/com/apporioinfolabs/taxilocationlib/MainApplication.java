@@ -42,8 +42,6 @@ public class MainApplication extends AtsApplication {
         return true;
     }
 
-    @Override
-    public boolean setSocketConnection() { return true; }
 
     @Override
     public boolean allowLiveLogs() {
@@ -90,14 +88,16 @@ public class MainApplication extends AtsApplication {
         return true;
     }
 
-    @Override
-    public boolean allowAppStateSyncOnSocket() {
-        return true;
-    }
 
     @Override
     public AtsSocketConnectionHandlers setAtsConnectionStateHandlers() {
         return new AtsConnection();
+    }
+
+
+    @Override
+    public String setTokenForConnection() {
+        return "TOKEN FETCHED FROM PANEL";
     }
 
     @Override
