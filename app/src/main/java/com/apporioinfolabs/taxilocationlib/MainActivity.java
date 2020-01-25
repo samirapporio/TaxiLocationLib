@@ -422,46 +422,80 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
         if(add_scren_id.getText().toString().equals("")){
             Toast.makeText(this, "Required Field missing ", Toast.LENGTH_SHORT).show();
         }else{
-            AtsApplication.setScreenId(""+add_scren_id.getText().toString(), new OnAtsEmissionListeners() {
+            atsSocket.startListeningScreenId(add_scren_id.getText().toString(), new AtsSocket.OnAtsSocketListener() {
                 @Override
-                public void onSuccess(final String message) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
-                    });
-
-
+                public void onMessageReceived(String message) {
+                    Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
-                public void onFailed(final String message) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
-                    });
+                public void onSuccessRegistrataion(String message) {
+                    Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailureRegistration(String message) {
+                    Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
                 }
             });
+//            AtsApplication.setScreenId(""+, new OnAtsEmissionListeners() {
+//                @Override
+//                public void onSuccess(final String message) {
+//                    mHandler.post(new Runnable() {
+//                        @Override
+//                        public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+//                    });
+//
+//
+//                }
+//
+//                @Override
+//                public void onFailed(final String message) {
+//                    mHandler.post(new Runnable() {
+//                        @Override
+//                        public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+//                    });
+//                }
+//            });
         }
     }
 
     public void removeScreenId(View view) {
-        AtsApplication.removeScreenId( new OnAtsEmissionListeners() {
+
+        atsSocket.stopListenScreenId(""+add_scren_id.getText().toString(), new AtsSocket.OnAtsSocketListener() {
             @Override
-            public void onSuccess(final String message) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
-                });
+            public void onMessageReceived(String message) {
+                Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onFailed(final String message) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
-                });
+            public void onSuccessRegistrataion(String message) {
+                Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailureRegistration(String message) {
+                Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show();
             }
         });
+
+//        AtsApplication.removeScreenId( new OnAtsEmissionListeners() {
+//            @Override
+//            public void onSuccess(final String message) {
+//                mHandler.post(new Runnable() {
+//                    @Override
+//                    public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+//                });
+//            }
+//
+//            @Override
+//            public void onFailed(final String message) {
+//                mHandler.post(new Runnable() {
+//                    @Override
+//                    public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+//                });
+//            }
+//        });
 
     }
 

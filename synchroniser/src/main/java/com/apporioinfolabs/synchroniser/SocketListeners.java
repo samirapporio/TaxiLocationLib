@@ -175,46 +175,46 @@ public class SocketListeners {
     }
 
 
-
-    public static void emitAddScreenId(String screenId, final OnAtsEmissionListeners onAtsEmissionListeners){
-        if(AtsApplication.getSocket().connected() && AtsApplication.isLiveLogsAllowed ){
-            AtsApplication.getSocket().emit(ADD_SCREEN_ID, screenId, new Ack() {
-                @Override
-                public void call(Object... args) {
-                    ModalAtsEmmisionResultChecker modalAtsEmmisionResultChecker = AtsApplication.getGson().fromJson(AtsApplication.getGson().toJson(args[0]),ModalAtsEmmisionResultChecker.class);
-                    if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 0 ){
-                        onAtsEmissionListeners.onFailed(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
-                    }else if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 1){
-                        onAtsEmissionListeners.onSuccess(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
-                    }
-                }
-            });
-        }else{
-            onAtsEmissionListeners.onFailed("Socket is not connected for emitting Add Screen ID. ");
-            Log.e(TAG, "Socket is not connected for emitting Add Screen ID. ");
-        }
-    }
-
-
-
-    public static void emitRemoveScreenId( final OnAtsEmissionListeners onAtsEmissionListeners){
-        if(AtsApplication.getSocket().connected() && AtsApplication.isLiveLogsAllowed ){
-            AtsApplication.getSocket().emit(REMOVE_SCREEN_ID, "REMOVE", new Ack() {
-                @Override
-                public void call(Object... args) {
-                    ModalAtsEmmisionResultChecker modalAtsEmmisionResultChecker = AtsApplication.getGson().fromJson(AtsApplication.getGson().toJson(args[0]),ModalAtsEmmisionResultChecker.class);
-                    if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 0 ){
-                        onAtsEmissionListeners.onFailed(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
-                    }else if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 1){
-                        onAtsEmissionListeners.onSuccess(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
-                    }
-                }
-            });
-        }else{
-            onAtsEmissionListeners.onFailed("Socket is not connected for emitting remove screen id. ");
-            Log.e(TAG, "Socket is not connected for emitting remove screen id. ");
-        }
-    }
+//
+//    public static void emitAddScreenId(String screenId, final OnAtsEmissionListeners onAtsEmissionListeners){
+//        if(AtsApplication.getSocket().connected() && AtsApplication.isLiveLogsAllowed ){
+//            AtsApplication.getSocket().emit(ADD_SCREEN_ID, screenId, new Ack() {
+//                @Override
+//                public void call(Object... args) {
+//                    ModalAtsEmmisionResultChecker modalAtsEmmisionResultChecker = AtsApplication.getGson().fromJson(AtsApplication.getGson().toJson(args[0]),ModalAtsEmmisionResultChecker.class);
+//                    if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 0 ){
+//                        onAtsEmissionListeners.onFailed(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+//                    }else if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 1){
+//                        onAtsEmissionListeners.onSuccess(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+//                    }
+//                }
+//            });
+//        }else{
+//            onAtsEmissionListeners.onFailed("Socket is not connected for emitting Add Screen ID. ");
+//            Log.e(TAG, "Socket is not connected for emitting Add Screen ID. ");
+//        }
+//    }
+//
+//
+//
+//    public static void emitRemoveScreenId( final OnAtsEmissionListeners onAtsEmissionListeners){
+//        if(AtsApplication.getSocket().connected() && AtsApplication.isLiveLogsAllowed ){
+//            AtsApplication.getSocket().emit(REMOVE_SCREEN_ID, "REMOVE", new Ack() {
+//                @Override
+//                public void call(Object... args) {
+//                    ModalAtsEmmisionResultChecker modalAtsEmmisionResultChecker = AtsApplication.getGson().fromJson(AtsApplication.getGson().toJson(args[0]),ModalAtsEmmisionResultChecker.class);
+//                    if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 0 ){
+//                        onAtsEmissionListeners.onFailed(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+//                    }else if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 1){
+//                        onAtsEmissionListeners.onSuccess(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+//                    }
+//                }
+//            });
+//        }else{
+//            onAtsEmissionListeners.onFailed("Socket is not connected for emitting remove screen id. ");
+//            Log.e(TAG, "Socket is not connected for emitting remove screen id. ");
+//        }
+//    }
 
 
 

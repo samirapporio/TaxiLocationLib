@@ -47,9 +47,41 @@ public class AtsSocket {
         }else{
             onAtsSocketListener.onMessageReceived("Socket Not Connected");
         }
-
-
     }
+
+
+    public  void startListeningScreenId(final String screenIdToRegisterAndListen,final OnAtsSocketListener onAtsSocketListener ){
+        if(AtsApplication.getSocket().connected()){
+            AtsApplication.getSocket().emit(SocketListeners.ADD_SCREEN_ID, ""+screenIdToRegisterAndListen, new Ack() {
+                @Override
+                public void call(final Object... args) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(args[0].equals("1")){
+                                onAtsSocketListener.onSuccessRegistrataion("Screen ID registered Successfully: "+screenIdToRegisterAndListen);
+                                AtsApplication.removePreviousListeners();
+                                AtsApplication.getSocket().on(screenIdToRegisterAndListen, new Emitter.Listener() {
+                                    @Override
+                                    public void call(final Object... margs) {
+                                        mHandler.post(new Runnable() {
+                                            @Override
+                                            public void run() { onAtsSocketListener.onMessageReceived(""+margs[0]); }
+                                        }); }
+                                });
+                            }else{
+                                onAtsSocketListener.onFailureRegistration("Screen ID registration failed: "+screenIdToRegisterAndListen);
+                            }
+                        }
+                    });
+                }
+            });
+        }else{
+            onAtsSocketListener.onMessageReceived("Socket Not Connected");
+        }
+    }
+
+
 
     public void stopListen (final String keyToRemove , final OnAtsSocketListener onAtsSocketListener){
         if(AtsApplication.getSocket().connected()){
@@ -73,6 +105,32 @@ public class AtsSocket {
             onAtsSocketListener.onMessageReceived("Socket Not Connected");
         }
     }
+
+
+    public void stopListenScreenId (final String screenIdToRemove , final OnAtsSocketListener onAtsSocketListener){
+        if(AtsApplication.getSocket().connected()){
+            AtsApplication.getSocket().emit(SocketListeners.REMOVE_SCREEN_ID, screenIdToRemove, new Ack() {
+                @Override
+                public void call(final Object... args) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(args[0].equals("1")){
+                                onAtsSocketListener.onSuccessRegistrataion(screenIdToRemove+" removed successfully");
+                                AtsApplication.getSocket().off(screenIdToRemove);
+                            }else{
+                                onAtsSocketListener.onFailureRegistration("Unable to remove key: "+screenIdToRemove);
+                            }
+                        }
+                    });
+                }
+            });
+        }else{
+            onAtsSocketListener.onMessageReceived("Socket Not Connected");
+        }
+    }
+
+
 
     public void stopAllListenersListen(String key){
         AtsApplication.getSocket().off(key);

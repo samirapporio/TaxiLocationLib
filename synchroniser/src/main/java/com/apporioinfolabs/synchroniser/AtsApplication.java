@@ -231,26 +231,26 @@ public abstract class AtsApplication extends Application  implements Application
     }
 
 
-    public static void setScreenId(String screenId, OnAtsEmissionListeners onAtsEmissionListeners){
-        if(isSocketConnected()){
-            SocketListeners.emitAddScreenId(screenId, onAtsEmissionListeners);
-        }else{
-            onAtsEmissionListeners.onFailed("Socket is not connected for emitting add screen id");
-            Log.e(TAG, "Socket is not connected for emitting add screen id");
-        }
+//    public static void setScreenId(String screenId, OnAtsEmissionListeners onAtsEmissionListeners){
+//        if(isSocketConnected()){
+//            SocketListeners.emitAddScreenId(screenId, onAtsEmissionListeners);
+//        }else{
+//            onAtsEmissionListeners.onFailed("Socket is not connected for emitting add screen id");
+//            Log.e(TAG, "Socket is not connected for emitting add screen id");
+//        }
+//
+//    }
 
-    }
 
-
-    public static void removeScreenId(OnAtsEmissionListeners onAtsEmissionListeners){
-        if(isSocketConnected()){
-            SocketListeners.emitRemoveScreenId(onAtsEmissionListeners);
-        }else{
-            onAtsEmissionListeners.onFailed("Socket is not connected for emitting remove screen id");
-            Log.e(TAG, "Socket is not connected for emitting remove screen id");
-        }
-
-    }
+//    public static void removeScreenId(OnAtsEmissionListeners onAtsEmissionListeners){
+//        if(isSocketConnected()){
+//            SocketListeners.emitRemoveScreenId(onAtsEmissionListeners);
+//        }else{
+//            onAtsEmissionListeners.onFailed("Socket is not connected for emitting remove screen id");
+//            Log.e(TAG, "Socket is not connected for emitting remove screen id");
+//        }
+//
+//    }
 
 
 
