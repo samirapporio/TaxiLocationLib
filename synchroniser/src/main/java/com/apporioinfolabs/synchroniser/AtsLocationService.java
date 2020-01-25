@@ -96,6 +96,8 @@ public abstract  class AtsLocationService extends Service  {
 
 
 
+
+
         if(!AtsApplication.setIntervalRunningWhenVehicleStops){
             onReceiveLocation(event.pojolocation);
 //            APPORIOLOGS.debugLog(""+TAG,"Sending location to developer code for running API : (When setIntervalRunningWhenVehicleStops = false)");

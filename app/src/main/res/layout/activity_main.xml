@@ -421,6 +421,114 @@
 
 
 
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center|left"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set Criteria"/>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <EditText
+                        android:layout_width="fill_parent"
+                        android:layout_height="49dp"
+                        android:layout_weight="1"
+                        android:layout_marginTop="5dp"
+                        android:hint="Enter Criteria"
+                        android:id="@+id/edt_criteria"
+                        android:textSize="10dp"
+                        android:paddingLeft="10dp"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Save"
+                        android:background="#9869F1"
+                        android:textColor="@color/white"
+                        android:layout_marginRight="5dp"
+                        android:onClick="saveCriteria"/>
+
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Remove"
+                        android:background="#9869F1"
+                        android:textColor="@color/white"
+                        android:onClick="removeCriteria"/>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+
+            // emit screen_id
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center|left"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set Screen ID"/>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <EditText
+                        android:layout_width="fill_parent"
+                        android:layout_height="49dp"
+                        android:layout_weight="1"
+                        android:layout_marginTop="5dp"
+                        android:hint="Add/Edit your SCreen ID"
+                        android:id="@+id/add_scren_id"
+                        android:textSize="10dp"
+                        android:paddingLeft="10dp"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add"
+                        android:background="#9869F1"
+                        android:textColor="@color/white"
+                        android:onClick="addScreenId"/>
+
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Remove"
+                        android:layout_marginLeft="5dp"
+                        android:background="#9869F1"
+                        android:textColor="@color/white"
+                        android:onClick="removeScreenId"/>
+
+                </LinearLayout>
+
+
+
+
+            </LinearLayout>
+
+
 
 
 

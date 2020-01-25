@@ -212,6 +212,48 @@ public abstract class AtsApplication extends Application  implements Application
         APPORIOLOGS.extraData(data);
     }
 
+    public static void setCriteria(String data , OnAtsEmissionListeners onAtsEmissionListeners) throws Exception{
+        if(isSocketConnected()){
+            SocketListeners.emitCriteria(data, onAtsEmissionListeners);
+        }else{
+            onAtsEmissionListeners.onFailed("Socket is not connected for setting criteria");
+            Log.e(TAG, "Socket is not connected for setting criteria");
+        }
+    }
+
+    public static void removeCriteria(OnAtsEmissionListeners onAtsEmissionListeners) throws  Exception{
+        if(isSocketConnected()){
+            SocketListeners.removeCriteria(onAtsEmissionListeners);
+        }else{
+            onAtsEmissionListeners.onFailed("Socket is not connected for setting criteria");
+            Log.e(TAG, "Socket is not connected for removing criteria");
+        }
+    }
+
+
+    public static void setScreenId(String screenId, OnAtsEmissionListeners onAtsEmissionListeners){
+        if(isSocketConnected()){
+            SocketListeners.emitAddScreenId(screenId, onAtsEmissionListeners);
+        }else{
+            onAtsEmissionListeners.onFailed("Socket is not connected for emitting add screen id");
+            Log.e(TAG, "Socket is not connected for emitting add screen id");
+        }
+
+    }
+
+
+    public static void removeScreenId(OnAtsEmissionListeners onAtsEmissionListeners){
+        if(isSocketConnected()){
+            SocketListeners.emitRemoveScreenId(onAtsEmissionListeners);
+        }else{
+            onAtsEmissionListeners.onFailed("Socket is not connected for emitting remove screen id");
+            Log.e(TAG, "Socket is not connected for emitting remove screen id");
+        }
+
+    }
+
+
+
     public static SharedPreferences getAtsPrefrences (){
         if(sharedPref == null){
             sharedPref = mContext.getSharedPreferences(SHARED_PREFRENCE, Context.MODE_PRIVATE);
@@ -399,8 +441,6 @@ public abstract class AtsApplication extends Application  implements Application
         Log.i(TAG +"APP_STATE", "On app configuration changed");
         super.onConfigurationChanged(newConfig);
     }
-
-
 
     @Override
     public void onSyncSuccess(String action) {

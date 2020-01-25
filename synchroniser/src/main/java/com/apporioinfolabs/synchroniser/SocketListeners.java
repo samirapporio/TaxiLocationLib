@@ -1,8 +1,11 @@
 package com.apporioinfolabs.synchroniser;
 
+import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
+import com.apporioinfolabs.synchroniser.modals.ModalAtsEmmisionResultChecker;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Ack;
 
@@ -18,6 +21,10 @@ public class SocketListeners {
     public static final String REQUEST_LISTENER = "request_listener" ;
     public static final String REMOVE_LISTENER = "remove_listener" ;
     public static final String LIVE_LOG = "live_log" ;
+    public static final String CRITERIA = "criteria" ;
+    public static final String REMOVE_CRITERIA = "remove_criteria" ;
+    public static final String ADD_SCREEN_ID = "add_screen_id" ;
+    public static final String REMOVE_SCREEN_ID = "remove_screen_id" ;
     public static final String TOKEN = "token" ;
     public static final String APP_STATE = "app_state" ;
 
@@ -118,9 +125,98 @@ public class SocketListeners {
                 }
             });
         }else{
-            Log.d(TAG, "Socket is not connected for emitting live logs. ");
+            Log.e(TAG, "Socket is not connected for emitting live logs. ");
         }
     }
+
+
+    public static void emitCriteria(String data, final OnAtsEmissionListeners onAtsEmissionListeners) throws Exception{
+        if(AtsApplication.getSocket().connected() && AtsApplication.isLiveLogsAllowed ){
+            AtsApplication.getSocket().emit(CRITERIA, new JSONObject().put("identifier",""+AppInfoManager.getPackageName()+"_"+ Settings.Secure.getString(AtsApplication.mContext.getContentResolver(), Settings.Secure.ANDROID_ID)).put("criteria",""+data), new Ack() {
+                @Override
+                public void call(Object... args) {
+
+
+                    ModalAtsEmmisionResultChecker modalAtsEmmisionResultChecker = AtsApplication.getGson().fromJson(AtsApplication.getGson().toJson(args[0]),ModalAtsEmmisionResultChecker.class);
+                    if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 0 ){
+                        onAtsEmissionListeners.onFailed(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+                    }else if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 1){
+                        onAtsEmissionListeners.onSuccess(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+                    }
+                }
+            });
+        }else{
+            onAtsEmissionListeners.onFailed("Socket is not connected for emitting set Criteria");
+            Log.d(TAG, "Socket is not connected for emitting  set Criteria");
+        }
+    }
+
+
+
+    public static void removeCriteria (final OnAtsEmissionListeners onAtsEmissionListeners) throws Exception{
+        if(AtsApplication.getSocket().connected() && AtsApplication.isLiveLogsAllowed ){
+            AtsApplication.getSocket().emit(REMOVE_CRITERIA, new JSONObject().put("identifier",""+AppInfoManager.getPackageName()+"_"+ Settings.Secure.getString(AtsApplication.mContext.getContentResolver(), Settings.Secure.ANDROID_ID)).put("criteria","REMOVE EXISTING"), new Ack() {
+                @Override
+                public void call(Object... args) {
+
+
+                    ModalAtsEmmisionResultChecker modalAtsEmmisionResultChecker = AtsApplication.getGson().fromJson(AtsApplication.getGson().toJson(args[0]),ModalAtsEmmisionResultChecker.class);
+                    if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 0 ){
+                        onAtsEmissionListeners.onFailed(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+                    }else if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 1){
+                        onAtsEmissionListeners.onSuccess(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+                    }
+                }
+            });
+        }else{
+            onAtsEmissionListeners.onFailed("Socket is not connected for remove Criteria");
+            Log.d(TAG, "Socket is not connected for remove Criteria");
+        }
+    }
+
+
+
+    public static void emitAddScreenId(String screenId, final OnAtsEmissionListeners onAtsEmissionListeners){
+        if(AtsApplication.getSocket().connected() && AtsApplication.isLiveLogsAllowed ){
+            AtsApplication.getSocket().emit(ADD_SCREEN_ID, screenId, new Ack() {
+                @Override
+                public void call(Object... args) {
+                    ModalAtsEmmisionResultChecker modalAtsEmmisionResultChecker = AtsApplication.getGson().fromJson(AtsApplication.getGson().toJson(args[0]),ModalAtsEmmisionResultChecker.class);
+                    if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 0 ){
+                        onAtsEmissionListeners.onFailed(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+                    }else if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 1){
+                        onAtsEmissionListeners.onSuccess(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+                    }
+                }
+            });
+        }else{
+            onAtsEmissionListeners.onFailed("Socket is not connected for emitting Add Screen ID. ");
+            Log.e(TAG, "Socket is not connected for emitting Add Screen ID. ");
+        }
+    }
+
+
+
+    public static void emitRemoveScreenId( final OnAtsEmissionListeners onAtsEmissionListeners){
+        if(AtsApplication.getSocket().connected() && AtsApplication.isLiveLogsAllowed ){
+            AtsApplication.getSocket().emit(REMOVE_SCREEN_ID, "REMOVE", new Ack() {
+                @Override
+                public void call(Object... args) {
+                    ModalAtsEmmisionResultChecker modalAtsEmmisionResultChecker = AtsApplication.getGson().fromJson(AtsApplication.getGson().toJson(args[0]),ModalAtsEmmisionResultChecker.class);
+                    if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 0 ){
+                        onAtsEmissionListeners.onFailed(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+                    }else if(modalAtsEmmisionResultChecker.getNameValuePairs().getResult() == 1){
+                        onAtsEmissionListeners.onSuccess(""+modalAtsEmmisionResultChecker.getNameValuePairs().getMessage());
+                    }
+                }
+            });
+        }else{
+            onAtsEmissionListeners.onFailed("Socket is not connected for emitting remove screen id. ");
+            Log.e(TAG, "Socket is not connected for emitting remove screen id. ");
+        }
+    }
+
+
 
 
     public static void emitAppState(){

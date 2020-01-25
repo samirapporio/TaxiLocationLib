@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +31,7 @@ import com.apporioinfolabs.synchroniser.ApporioTrackingSystem;
 import com.apporioinfolabs.synchroniser.AtsApplication;
 import com.apporioinfolabs.synchroniser.AtsEventBus;
 import com.apporioinfolabs.synchroniser.AtsSocket;
+import com.apporioinfolabs.synchroniser.OnAtsEmissionListeners;
 import com.apporioinfolabs.synchroniser.logssystem.APPORIOLOGS;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,7 +47,7 @@ import org.greenrobot.eventbus.ThreadMode;
 public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
 
 
-    EditText editText , edt_listen_box , log_input_edt;
+    EditText editText , edt_listen_box , log_input_edt, edtCriteria, add_scren_id;
     TextView fetched_text , unique_no_text, device_fetch_text, log_level_text ;
     ImageView  device_image ;
     ProgressBar device_progress_fetch ;
@@ -59,6 +61,7 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
     private Gson gson ;
     boolean SocketConnectionState = false  ;
     RequestQueue queue ;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +79,12 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
         device_image = findViewById(R.id.device_image);
         device_progress_fetch = findViewById(R.id.device_progress_fetch);
         autoSyncSwitch = findViewById(R.id.autoSyncSwitch);
+        edtCriteria = findViewById(R.id.edt_criteria);
+        add_scren_id = findViewById(R.id.add_scren_id);
         liveLogsSwitch = findViewById(R.id.liveLogsSwitch);
         synclogsonminimiseSwitch = findViewById(R.id.synclogsonminimiseSwitch);
+
+        mHandler = new Handler();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
@@ -281,7 +288,6 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
         super.onPause();
     }
 
-
     private void showAlertForSelection (){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -354,8 +360,6 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
     }
 
 
-
-
     private void checkLocationPermission (){
         if ( ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1122);
@@ -383,5 +387,106 @@ public class MainActivity extends BaseActivity implements  OnMapReadyCallback {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    public void saveCriteria(View view) {
+        if(edtCriteria.getText().toString().equals("")){
+            Toast.makeText(this, "Required field missing in criteria", Toast.LENGTH_SHORT).show();
+        }else{
+            try {
+                AtsApplication.setCriteria("" + edtCriteria.getText().toString(), new OnAtsEmissionListeners() {
+                    @Override
+                    public void onSuccess(final String message) {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+                        });
+                    }
+
+                    @Override
+                    public void onFailed(final String message) {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+                        });
+                    }
+                });
+            }catch (Exception e){
+                Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void addScreenId(View view) {
+        if(add_scren_id.getText().toString().equals("")){
+            Toast.makeText(this, "Required Field missing ", Toast.LENGTH_SHORT).show();
+        }else{
+            AtsApplication.setScreenId(""+add_scren_id.getText().toString(), new OnAtsEmissionListeners() {
+                @Override
+                public void onSuccess(final String message) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+                    });
+
+
+                }
+
+                @Override
+                public void onFailed(final String message) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+                    });
+                }
+            });
+        }
+    }
+
+    public void removeScreenId(View view) {
+        AtsApplication.removeScreenId( new OnAtsEmissionListeners() {
+            @Override
+            public void onSuccess(final String message) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+                });
+            }
+
+            @Override
+            public void onFailed(final String message) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+                });
+            }
+        });
+
+    }
+
+    public void removeCriteria(View view) {
+        try{
+            AtsApplication.removeCriteria(new OnAtsEmissionListeners() {
+                @Override
+                public void onSuccess(final String message) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+                    });
+                }
+
+                @Override
+                public void onFailed(final String message) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() { Toast.makeText(MainActivity.this, ""+message, Toast.LENGTH_SHORT).show(); }
+                    });
+                }
+            });
+
+        }catch (Exception e){
+            Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 }
